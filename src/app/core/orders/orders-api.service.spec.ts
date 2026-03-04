@@ -5,9 +5,9 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
-import { OrdersApiService } from './orders-api.service';
-import { ORDERS_API_URL } from './orders-api.config';
-import type { Order } from '../models/order.model';
+import type { Order } from '@core/models/order.model';
+import { ORDERS_API_URL } from '@core/orders/orders-api.config';
+import { OrdersApiService } from '@core/orders/orders-api.service';
 
 describe('OrdersApiService', () => {
   let service: OrdersApiService;

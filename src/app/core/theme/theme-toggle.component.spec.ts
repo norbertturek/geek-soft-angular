@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ThemeService } from './theme.service';
-import { ThemeToggleComponent } from './theme-toggle.component';
+import { ThemeService } from '@core/theme/theme.service';
+import { ThemeToggleComponent } from '@core/theme/theme-toggle.component';
 
 describe('ThemeToggleComponent', () => {
   let toggleCalled: boolean;

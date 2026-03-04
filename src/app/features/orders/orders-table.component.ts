@@ -16,7 +16,7 @@ const ROW_CLASS = 'bg-[var(--color-row-bg)] hover:bg-[var(--color-row-bg-hover)]
   imports: [DatePipe, DecimalPipe],
   template: `
     <table class="w-full border-collapse">
-      <caption class="sr-only">Lista zleceń</caption>
+      <caption class="sr-only">Orders list</caption>
       <thead>
         <tr>
           <th scope="col" [class]="headerCellClass">Symbol</th>
@@ -30,7 +30,7 @@ const ROW_CLASS = 'bg-[var(--color-row-bg)] hover:bg-[var(--color-row-bg-hover)]
       <tbody>
         @if (orders().length === 0) {
           <tr [class]="rowClass">
-            <td colspan="6" [class]="cellClass">Brak zleceń</td>
+            <td colspan="6" [class]="cellClass">No orders</td>
           </tr>
         } @else {
           @for (order of orders(); track order.id) {

@@ -1,34 +1,44 @@
 # geek-soft-angular
 
-Aplikacja Angular do zarządzania zleceniami tradingowymi (orders), zbudowana w Angular 21.
+Angular application for trading order management, built with Angular 21.
 
-## Struktura projektu
+## Project structure
 
 ```
 src/app/
-├── core/           # Serwisy, store, modele współdzielone
-│   ├── models/     # Typy (Order, itp.)
+├── core/           # Shared services, store, models
+│   ├── models/     # Types (Order, GroupedOrder, etc.)
 │   ├── orders/     # OrdersApiService, OrdersStore
 │   └── theme/      # ThemeService, ThemeToggleComponent
-├── features/       # Feature modules
+├── features/       # Feature pages
+│   ├── home/       # HomePage — Angular welcome page
 │   └── orders/     # OrdersPage, OrdersTableComponent
 └── app.config.ts, app.routes.ts
 ```
+
+## Routing
+
+| Path | Page |
+|------|------|
+| `/` | Home — Angular welcome page |
+| `/orders` | Orders — orders list from API |
+
+The header with navigation (Home, Orders) and theme toggle is shared across all views.
 
 ## Path aliases
 
 - `@app/*` → `src/app/*`
 - `@core/*` → `src/app/core/*`
 
-Przykład: `import { Order } from '@core/models/order.model'`
+Example: `import { Order } from '@core/models/order.model'`
 
 ## Styling
 
-Projekt używa **Tailwind CSS** (utility-first). Kolory z palety projektowej: `text-[var(--color-text)]`, `bg-[var(--color-row-bg)]`, itd.
+The project uses **Tailwind CSS** (utility-first). For palette colors: `text-[var(--color-text)]`, `bg-[var(--color-row-bg)]`, etc.
 
-## Konwencje
+## Conventions
 
-Zobacz [AGENTS.md](./AGENTS.md) dla zasad Angular, TypeScript, Tailwind, dostępności i palety kolorów.
+See [AGENTS.md](./AGENTS.md) for Angular, TypeScript, Tailwind, accessibility, and color palette guidelines.
 
 ## Development server
 

@@ -1,5 +1,9 @@
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
+## Language
+
+- **Always use English** for all generated content: code comments, variable names, commit messages, PR descriptions, UI text, docs, and any other project artifacts. Do not use Polish or other languages.
+
 ## Imports
 
 - Use path aliases: `@app/*` for app-wide, `@core/*` for core (models, services, stores). Examples:

@@ -13,8 +13,8 @@ import { ThemeService } from '@core/theme/theme.service';
       (click)="theme.toggle()"
       [attr.aria-label]="
         theme.effective() === 'dark'
-          ? 'Przełącz na jasny motyw'
-          : 'Przełącz na ciemny motyw'
+          ? 'Switch to light theme'
+          : 'Switch to dark theme'
       "
       class="flex items-center px-3 py-1.5 rounded-full border-0 bg-[color-mix(in_srgb,var(--color-text)_10%,transparent)] text-[var(--color-text)] hover:bg-[color-mix(in_srgb,var(--color-text)_15%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text)] transition-colors duration-300"
     >

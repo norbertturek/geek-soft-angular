@@ -2,8 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
+  signal,
 } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import type { GroupedOrder } from '@core/models/order.model';
 
 const CELL_CLASS = 'py-2 px-3 text-left text-[var(--color-text)]';
@@ -12,34 +13,62 @@ const ROW_CLASS = 'bg-[var(--color-row-bg)] hover:bg-[var(--color-row-bg-hover)]
 const GROUP_ROW_CLASS =
   'bg-[color-mix(in_srgb,var(--color-text)_8%,var(--color-row-bg))] hover:bg-[color-mix(in_srgb,var(--color-text)_12%,var(--color-row-bg))] font-semibold';
 
+const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
+
 @Component({
   selector: 'app-orders-table',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe],
+  imports: [DatePipe, DecimalPipe],
   template: `
     <table class="w-full border-collapse">
       <caption class="sr-only">Orders list grouped by symbol</caption>
       <thead>
         <tr>
           <th scope="col" [class]="headerCellClass">Symbol</th>
-          <th scope="col" [class]="headerCellClass">Open Price (avg)</th>
-          <th scope="col" [class]="headerCellClass">Size (sum)</th>
-          <th scope="col" [class]="headerCellClass">Swap (sum)</th>
+          <th scope="col" [class]="headerCellClass">Open Time</th>
+          <th scope="col" [class]="headerCellClass">Open Price</th>
+          <th scope="col" [class]="headerCellClass">Side</th>
+          <th scope="col" [class]="headerCellClass">Size</th>
+          <th scope="col" [class]="headerCellClass">Swap</th>
         </tr>
       </thead>
       <tbody>
         @if (groupedOrders().length === 0) {
           <tr [class]="rowClass">
-            <td colspan="4" [class]="cellClass">No orders</td>
+            <td colspan="6" [class]="cellClass">No orders</td>
           </tr>
         } @else {
           @for (group of groupedOrders(); track group.symbol) {
-            <tr [class]="groupRowClass">
-              <th scope="row" [class]="cellClass">{{ group.symbol }} ({{ group.orders.length }})</th>
+            @let expanded = isExpanded(group.symbol);
+            <tr
+              [class]="groupRowClass"
+              role="button"
+              [attr.aria-expanded]="expanded"
+              [attr.aria-label]="(expanded ? 'Collapse' : 'Expand') + ' group ' + group.symbol"
+              (click)="toggleGroup(group.symbol)"
+              (keydown)="handleGroupKeydown($event, group.symbol)"
+              tabindex="0"
+            >
+              <th scope="row" colspan="2" [class]="cellClass">
+                {{ group.symbol }} ({{ group.orders.length }})
+              </th>
               <td [class]="cellClass">{{ group.avgOpenPrice | number:'1.2-2' }}</td>
+              <td [class]="cellClass" aria-hidden="true"></td>
               <td [class]="cellClass">{{ group.sumSize | number:'1.2-8' }}</td>
               <td [class]="cellClass">{{ group.sumSwap | number:'1.2-8' }}</td>
             </tr>
+            @if (expanded) {
+              @for (order of group.orders; track order.id) {
+                <tr [class]="rowClass">
+                  <td [class]="cellClass">{{ order.symbol }}</td>
+                  <td [class]="cellClass">{{ order.openTime | date:openTimeFormat }}</td>
+                  <td [class]="cellClass">{{ order.openPrice | number:'1.2-2' }}</td>
+                  <td [class]="cellClass">{{ order.side }}</td>
+                  <td [class]="cellClass">{{ order.size | number:'1.2-8' }}</td>
+                  <td [class]="cellClass">{{ order.swap | number:'1.2-8' }}</td>
+                </tr>
+              }
+            }
           }
         }
       </tbody>
@@ -48,8 +77,34 @@ const GROUP_ROW_CLASS =
 })
 export class OrdersTableComponent {
   readonly groupedOrders = input.required<GroupedOrder[]>();
+
+  protected readonly expandedGroups = signal<Set<string>>(new Set());
   protected readonly cellClass = CELL_CLASS;
   protected readonly headerCellClass = HEADER_CELL_CLASS;
   protected readonly rowClass = ROW_CLASS;
   protected readonly groupRowClass = GROUP_ROW_CLASS;
+  protected readonly openTimeFormat = OPEN_TIME_FORMAT;
+
+  protected isExpanded(symbol: string): boolean {
+    return this.expandedGroups().has(symbol);
+  }
+
+  protected toggleGroup(symbol: string): void {
+    this.expandedGroups.update((set) => {
+      const next = new Set(set);
+      if (next.has(symbol)) {
+        next.delete(symbol);
+      } else {
+        next.add(symbol);
+      }
+      return next;
+    });
+  }
+
+  protected handleGroupKeydown(event: KeyboardEvent, symbol: string): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.toggleGroup(symbol);
+    }
+  }
 }

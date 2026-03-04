@@ -26,13 +26,15 @@ import { NewOrderFormComponent } from '@app/features/orders/new-order-form.compo
         [symbols]="store.uniqueSymbols()"
         (orderAdded)="onOrderAdded($event)"
       />
-      <app-orders-table
-        ngSkipHydration
-        [groupedOrders]="store.groupedOrders()"
-        [orderProfits]="store.orderProfits()"
-        [store]="store"
-        [notification]="notification"
-      />
+      <div class="overflow-x-auto" role="region" aria-label="Orders table">
+        <app-orders-table
+          ngSkipHydration
+          [groupedOrders]="store.groupedOrders()"
+          [orderProfits]="store.orderProfits()"
+          [store]="store"
+          [notification]="notification"
+        />
+      </div>
     }
   `,
 })

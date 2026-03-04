@@ -7,6 +7,7 @@
   --color-row-bg-hover: rgb(201, 209, 216);
   --color-profit-positive: rgb(60, 193, 149);
   --color-profit-negative: rgb(249, 76, 76);
+  --color-sticky-shadow: rgba(0, 0, 0, 0.06);
 }
 
 [data-theme='dark'] {
@@ -16,6 +17,7 @@
   --color-row-bg-hover: rgba(53, 71, 89, 0.5);
   --color-profit-positive: rgb(60, 193, 149);
   --color-profit-negative: rgb(249, 76, 76);
+  --color-sticky-shadow: rgba(255, 255, 255, 0.08);
 }
 
 body {

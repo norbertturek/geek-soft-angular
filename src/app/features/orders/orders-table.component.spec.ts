@@ -26,15 +26,16 @@ describe('OrdersTableComponent', () => {
   ];
 
   const mockStore = {
-    removeOrder: () => {},
-    removeGroup: () => {},
+    removeOrder: vi.fn(),
+    removeGroup: vi.fn(),
   } as unknown as OrdersStore;
 
   const mockNotification = {
-    show: () => {},
+    show: vi.fn(),
   } as unknown as NotificationService;
 
   beforeEach(async () => {
+    vi.clearAllMocks();
     await TestBed.configureTestingModule({
       imports: [OrdersTableComponent],
     }).compileComponents();
@@ -125,5 +126,34 @@ describe('OrdersTableComponent', () => {
     fixture.detectChanges();
 
     expect(el.textContent).toContain('BUY');
+  });
+
+  it('should call removeGroup and notification.show when close group button clicked', () => {
+    const fixture = createFixture();
+    const el = fixture.nativeElement as HTMLElement;
+    const closeBtn = el.querySelector('tbody tr button[type="button"]') as HTMLButtonElement;
+    expect(closeBtn).toBeTruthy();
+
+    closeBtn.click();
+    fixture.detectChanges();
+
+    expect(mockStore.removeGroup).toHaveBeenCalledWith('BTCUSD');
+    expect(mockNotification.show).toHaveBeenCalledWith('Closed order no. 1');
+  });
+
+  it('should call removeOrder and notification.show when close order button clicked', () => {
+    const fixture = createFixture();
+    const el = fixture.nativeElement as HTMLElement;
+    const groupRow = el.querySelector('tbody tr') as HTMLElement;
+    groupRow.click();
+    fixture.detectChanges();
+
+    const orderCloseBtns = el.querySelectorAll('tbody tr button[type="button"]');
+    const orderRowCloseBtn = orderCloseBtns[orderCloseBtns.length - 1] as HTMLButtonElement;
+    orderRowCloseBtn.click();
+    fixture.detectChanges();
+
+    expect(mockStore.removeOrder).toHaveBeenCalledWith(1);
+    expect(mockNotification.show).toHaveBeenCalledWith('Closed order no. 1');
   });
 });

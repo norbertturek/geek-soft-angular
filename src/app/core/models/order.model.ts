@@ -1,5 +1,15 @@
 export type OrderSide = 'BUY' | 'SELL';
 
+export interface Instrument {
+  symbol: string;
+  contractType: number;
+}
+
+export interface ContractType {
+  contractType: number;
+  contractSize: number;
+}
+
 export interface Order {
   id: number;
   symbol: string;
@@ -29,4 +39,5 @@ export interface GroupedOrder {
   avgOpenPrice: number;
   sumSize: number;
   sumSwap: number;
+  sumProfit: number;
 }

@@ -2,7 +2,21 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import type { Order } from '@core/models/order.model';
 import { OrdersApiService } from '@core/orders/orders-api.service';
+import { InstrumentsService } from '@core/orders/instruments.service';
+import { QuotesService } from '@core/orders/quotes.service';
 import { OrdersStore } from '@core/orders/orders.store';
+
+const mockInstruments = {
+  loadContractSizes: () => of(new Map([['BTCUSD', 1], ['EURUSD', 100000]])),
+  getContractSize: (s: string) => (s === 'EURUSD' ? 100000 : 1),
+} as unknown as InstrumentsService;
+
+const mockQuotes = {
+  connect: () => {},
+  subscribe: () => {},
+  unsubscribe: () => {},
+  quotes: () => new Map<string, number>([['BTCUSD', 105], ['EURUSD', 1.06]]),
+} as unknown as QuotesService;
 
 describe('OrdersStore', () => {
   let store: OrdersStore;
@@ -45,6 +59,8 @@ describe('OrdersStore', () => {
           provide: OrdersApiService,
           useValue: { fetchOrders: () => of(mockOrders) },
         },
+        { provide: InstrumentsService, useValue: mockInstruments },
+        { provide: QuotesService, useValue: mockQuotes },
       ],
     });
     store = TestBed.inject(OrdersStore);
@@ -83,6 +99,7 @@ describe('OrdersStore', () => {
     expect(btc!.avgOpenPrice).toBe(150); // (100 + 200) / 2
     expect(btc!.sumSize).toBeCloseTo(0.08); // 0.05 + 0.03
     expect(btc!.sumSwap).toBeCloseTo(0.001); // -0.001 + 0.002
+    expect(btc!.sumProfit).toBeDefined();
 
     const eur = grouped.find((g) => g.symbol === 'EURUSD');
     expect(eur).toBeDefined();
@@ -90,6 +107,7 @@ describe('OrdersStore', () => {
     expect(eur!.avgOpenPrice).toBe(1.05);
     expect(eur!.sumSize).toBe(1);
     expect(eur!.sumSwap).toBe(0);
+    expect(eur!.sumProfit).toBeDefined();
   });
 
   it('should return empty groupedOrders when orders is empty', () => {
@@ -108,6 +126,8 @@ describe('OrdersStore', () => {
               throwError(() => new Error('Network error')),
           },
         },
+        { provide: InstrumentsService, useValue: mockInstruments },
+        { provide: QuotesService, useValue: mockQuotes },
       ],
     });
     store = TestBed.inject(OrdersStore);

@@ -6,73 +6,41 @@ import {
 import { DatePipe, DecimalPipe } from '@angular/common';
 import type { Order } from '@core/models/order.model';
 
+const CELL_CLASS = 'py-2 px-3 text-left text-[var(--color-text)]';
+const HEADER_CELL_CLASS = `${CELL_CLASS} font-semibold`;
+const ROW_CLASS = 'bg-[var(--color-row-bg)] hover:bg-[var(--color-row-bg-hover)]';
+
 @Component({
   selector: 'app-orders-table',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, DecimalPipe],
-  styles: `
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-      color: var(--color-text);
-    }
-
-    th {
-      font-weight: 600;
-    }
-
-    tbody tr {
-      background-color: var(--color-row-bg);
-    }
-
-    tbody tr:hover {
-      background-color: var(--color-row-bg-hover);
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-  `,
   template: `
-    <table>
+    <table class="w-full border-collapse">
       <caption class="sr-only">Lista zleceń</caption>
       <thead>
         <tr>
-          <th scope="col">Symbol</th>
-          <th scope="col">Open Time</th>
-          <th scope="col">Open Price</th>
-          <th scope="col">Side</th>
-          <th scope="col">Size</th>
-          <th scope="col">Swap</th>
+          <th scope="col" [class]="headerCellClass">Symbol</th>
+          <th scope="col" [class]="headerCellClass">Open Time</th>
+          <th scope="col" [class]="headerCellClass">Open Price</th>
+          <th scope="col" [class]="headerCellClass">Side</th>
+          <th scope="col" [class]="headerCellClass">Size</th>
+          <th scope="col" [class]="headerCellClass">Swap</th>
         </tr>
       </thead>
       <tbody>
         @if (orders().length === 0) {
-          <tr>
-            <td colspan="6">Brak zleceń</td>
+          <tr [class]="rowClass">
+            <td colspan="6" [class]="cellClass">Brak zleceń</td>
           </tr>
         } @else {
           @for (order of orders(); track order.id) {
-            <tr>
-              <td>{{ order.symbol }}</td>
-              <td>{{ order.openTime | date:'dd.MM.yyyy HH:mm:ss' }}</td>
-              <td>{{ order.openPrice | number:'1.2-2' }}</td>
-              <td>{{ order.side }}</td>
-              <td>{{ order.size | number:'1.2-8' }}</td>
-              <td>{{ order.swap | number:'1.2-8' }}</td>
+            <tr [class]="rowClass">
+              <td [class]="cellClass">{{ order.symbol }}</td>
+              <td [class]="cellClass">{{ order.openTime | date:'dd.MM.yyyy HH:mm:ss' }}</td>
+              <td [class]="cellClass">{{ order.openPrice | number:'1.2-2' }}</td>
+              <td [class]="cellClass">{{ order.side }}</td>
+              <td [class]="cellClass">{{ order.size | number:'1.2-8' }}</td>
+              <td [class]="cellClass">{{ order.swap | number:'1.2-8' }}</td>
             </tr>
           }
         }
@@ -82,4 +50,7 @@ import type { Order } from '@core/models/order.model';
 })
 export class OrdersTableComponent {
   readonly orders = input.required<Order[]>();
+  protected readonly cellClass = CELL_CLASS;
+  protected readonly headerCellClass = HEADER_CELL_CLASS;
+  protected readonly rowClass = ROW_CLASS;
 }

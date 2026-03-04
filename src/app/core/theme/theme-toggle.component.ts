@@ -7,12 +7,6 @@ import { ThemeService } from '@core/theme/theme.service';
   host: {
     class: 'inline-flex',
   },
-  styles: `
-    button:focus-visible {
-      outline: 2px solid var(--color-text);
-      outline-offset: 2px;
-    }
-  `,
   template: `
     <button
       type="button"
@@ -22,11 +16,7 @@ import { ThemeService } from '@core/theme/theme.service';
           ? 'Przełącz na jasny motyw'
           : 'Przełącz na ciemny motyw'
       "
-      class="pill"
-      [style.background]="
-        'color-mix(in srgb, var(--color-text) 10%, transparent)'
-      "
-      [style.color]="'var(--color-text)'"
+      class="flex items-center px-3 py-1.5 rounded-full border-0 bg-[color-mix(in_srgb,var(--color-text)_10%,transparent)] text-[var(--color-text)] hover:bg-[color-mix(in_srgb,var(--color-text)_15%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text)] transition-colors duration-300"
     >
       @if (theme.effective() === 'dark') {
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

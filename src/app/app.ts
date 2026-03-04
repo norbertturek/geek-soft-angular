@@ -7,7 +7,9 @@ import { ThemeToggleComponent } from '@core/theme/theme-toggle.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, ThemeToggleComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css',
+  host: {
+    class: 'block font-sans antialiased box-border',
+  },
 })
 export class App {
   protected readonly title = signal('geek-soft-angular');

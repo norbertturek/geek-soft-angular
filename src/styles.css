@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+:root {
+  --color-bg-main: rgb(233, 237, 241);
+  --color-text: rgb(14, 15, 26);
+  --color-row-bg: rgb(220, 225, 229);
+  --color-row-bg-hover: rgb(201, 209, 216);
+  --color-profit-positive: rgb(60, 193, 149);
+  --color-profit-negative: rgb(249, 76, 76);
+}
+
+[data-theme='dark'] {
+  --color-bg-main: rgb(42, 56, 71);
+  --color-text: rgb(198, 210, 219);
+  --color-row-bg: rgba(14, 15, 26, 0.25);
+  --color-row-bg-hover: rgba(53, 71, 89, 0.5);
+  --color-profit-positive: rgb(60, 193, 149);
+  --color-profit-negative: rgb(249, 76, 76);
+}
+
+body {
+  background-color: var(--color-bg-main);
+  color: var(--color-text);
+}

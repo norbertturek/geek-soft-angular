@@ -7,6 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "ci": "npm run test && npm run build",
     "serve:ssr:geek-soft-angular": "node dist/geek-soft-angular/server/server.mjs",
     "codegen:eval": "npx web-codegen-scorer eval --env=angular-example",
     "codegen:init": "npx web-codegen-scorer init"

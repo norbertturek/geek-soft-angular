@@ -1,13 +1,33 @@
 @import 'tailwindcss';
 
+/* Typography aligned with Create Table UI Design */
+html {
+  font-size: 16px;
+}
+
+/* Design tokens - exact values from Create Table UI Design theme.css */
 :root {
+  /* Core palette from design */
   --color-bg-main: rgb(233, 237, 241);
   --color-text: rgb(14, 15, 26);
   --color-row-bg: rgb(220, 225, 229);
   --color-row-bg-hover: rgb(201, 209, 216);
   --color-profit-positive: rgb(60, 193, 149);
   --color-profit-negative: rgb(249, 76, 76);
-  --color-sticky-shadow: rgba(0, 0, 0, 0.06);
+  /* Design: row-hover rgb(201, 209, 216); detail rows use gray-50/50 */
+  --color-icon-muted: rgb(156, 163, 175);
+  --color-text-muted: rgb(107, 114, 128);
+  --color-border: rgb(229, 231, 235);
+  --color-card-bg: rgb(255, 255, 255);
+  --color-primary: rgb(37, 99, 235);
+  --color-primary-hover: rgb(29, 78, 216);
+  --color-input-bg: rgb(243, 244, 246);
+  --color-row-detail: rgba(249, 250, 251, 0.5);
+  --color-row-detail-hover: rgb(243, 244, 246);
+  --color-badge-buy-bg: rgb(220, 252, 231);
+  --color-badge-buy-text: rgb(21, 128, 61);
+  --color-badge-sell-bg: rgb(254, 226, 226);
+  --color-badge-sell-text: rgb(185, 28, 28);
 }
 
 [data-theme='dark'] {
@@ -17,10 +37,27 @@
   --color-row-bg-hover: rgba(53, 71, 89, 0.5);
   --color-profit-positive: rgb(60, 193, 149);
   --color-profit-negative: rgb(249, 76, 76);
-  --color-sticky-shadow: rgba(255, 255, 255, 0.08);
+  --color-icon-muted: rgb(156, 163, 175);
+  --color-text-muted: rgb(156, 163, 175);
+  --color-border: rgb(55, 65, 81);
+  --color-card-bg: rgb(31, 41, 55);
+  --color-primary: rgb(59, 130, 246);
+  --color-primary-hover: rgb(96, 165, 250);
+  --color-input-bg: rgb(17, 24, 39);
+  --color-row-detail: rgba(17, 24, 39, 0.5);
+  --color-row-detail-hover: rgb(17, 24, 39);
+  --color-badge-buy-bg: rgba(22, 163, 74, 0.3);
+  --color-badge-buy-text: rgb(74, 222, 128);
+  --color-badge-sell-bg: rgba(185, 28, 28, 0.3);
+  --color-badge-sell-text: rgb(248, 113, 113);
 }
 
 body {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
   background-color: var(--color-bg-main);
   color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

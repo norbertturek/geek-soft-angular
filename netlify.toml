@@ -1,0 +1,8 @@
+[build]
+  command = "node -e \"const f=require('fs'),p='angular.json',c=JSON.parse(f.readFileSync(p));const o=c.projects['geek-soft-angular'].architect.build.options;delete o.server;delete o.ssr;o.outputMode='static';f.writeFileSync(p,JSON.stringify(c,null,2));\" && npx ng build"
+  publish = "dist/geek-soft-angular/browser"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

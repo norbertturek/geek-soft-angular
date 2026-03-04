@@ -6,31 +6,36 @@ import type { Quote } from '@core/models/order.model';
 /** symbol -> bid price */
 export type QuotesMap = Map<string, number>;
 
+const MAX_RECONNECT_DELAY_MS = 30_000;
+const INITIAL_RECONNECT_DELAY_MS = 1_000;
+
 @Injectable({ providedIn: 'root' })
 export class QuotesService {
   private readonly platformId = inject(PLATFORM_ID);
   private ws: WebSocket | null = null;
   private subscribedSymbols = new Set<string>();
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectDelay = INITIAL_RECONNECT_DELAY_MS;
+  private shouldReconnect = false;
 
   readonly quotes = signal<QuotesMap>(new Map());
   readonly connected = signal(false);
 
   connect(): void {
-    if (!isPlatformBrowser(this.platformId) || this.ws?.readyState === WebSocket.OPEN) {
+    if (
+      !isPlatformBrowser(this.platformId) ||
+      this.ws?.readyState === WebSocket.OPEN ||
+      this.ws?.readyState === WebSocket.CONNECTING
+    ) {
       return;
     }
-    try {
-      this.ws = new WebSocket(QUOTES_WS_URL);
-      this.ws.onopen = () => this.connected.set(true);
-      this.ws.onclose = () => this.connected.set(false);
-      this.ws.onmessage = (event) => this.handleMessage(event.data);
-      this.ws.onerror = () => this.connected.set(false);
-    } catch {
-      this.connected.set(false);
-    }
+    this.shouldReconnect = true;
+    this.createConnection();
   }
 
   disconnect(): void {
+    this.shouldReconnect = false;
+    this.clearReconnectTimer();
     if (this.ws) {
       this.ws.close();
       this.ws = null;
@@ -58,6 +63,51 @@ export class QuotesService {
     if (toRemove.length === 0) return;
     for (const s of toRemove) this.subscribedSymbols.delete(s);
     this.send({ p: '/subscribe/removelist', d: toRemove });
+  }
+
+  private createConnection(): void {
+    this.clearReconnectTimer();
+    try {
+      this.ws = new WebSocket(QUOTES_WS_URL);
+      this.ws.onopen = () => {
+        this.connected.set(true);
+        this.reconnectDelay = INITIAL_RECONNECT_DELAY_MS;
+        this.resubscribeAll();
+      };
+      this.ws.onclose = () => {
+        this.connected.set(false);
+        this.scheduleReconnect();
+      };
+      this.ws.onmessage = (event) => this.handleMessage(event.data);
+      this.ws.onerror = () => {
+        this.connected.set(false);
+      };
+    } catch {
+      this.connected.set(false);
+      this.scheduleReconnect();
+    }
+  }
+
+  private scheduleReconnect(): void {
+    if (!this.shouldReconnect) return;
+    this.clearReconnectTimer();
+    this.reconnectTimer = setTimeout(() => {
+      this.createConnection();
+    }, this.reconnectDelay);
+    this.reconnectDelay = Math.min(this.reconnectDelay * 2, MAX_RECONNECT_DELAY_MS);
+  }
+
+  private clearReconnectTimer(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+  }
+
+  private resubscribeAll(): void {
+    if (this.subscribedSymbols.size > 0 && this.ws?.readyState === WebSocket.OPEN) {
+      this.send({ p: '/subscribe/addlist', d: [...this.subscribedSymbols] });
+    }
   }
 
   private send(msg: { p: string; d: string[] }): void {

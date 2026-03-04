@@ -76,7 +76,10 @@ Use these CSS variables only. Do not hardcode colors.
 | `--color-bg-main` | rgb(233, 237, 241) | rgb(42, 56, 71) |
 | `--color-text` | rgb(14, 15, 26) | rgb(198, 210, 219) |
 | `--color-row-bg` | rgb(220, 225, 229) | rgba(14, 15, 26, 0.25) |
-| `--color-row-bg-hover` | rgb(201, 209, 216) | rgba(53, 71, 89, 0.5) |
+| `--color-row-bg-hover` | rgb(249, 250, 251) | rgba(55, 65, 81, 0.5) |
+| `--color-row-detail` | rgba(249, 250, 251, 0.5) | rgba(17, 24, 39, 0.5) |
+| `--color-row-detail-hover` | rgb(243, 244, 246) | rgb(17, 24, 39) |
+| `--color-border` | rgb(229, 231, 235) | rgb(55, 65, 81) |
 | `--color-profit-positive` | rgb(60, 193, 149) | same |
 | `--color-profit-negative` | rgb(249, 76, 76) | same |
 

@@ -15,7 +15,7 @@ import { NotificationSnackbarComponent } from '@core/notification/notification-s
   ],
   templateUrl: './app.html',
   host: {
-    class: 'block font-sans antialiased box-border',
+    class: 'block box-border',
   },
 })
 export class App {}

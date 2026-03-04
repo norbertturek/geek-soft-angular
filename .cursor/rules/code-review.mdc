@@ -1,0 +1,36 @@
+---
+description: Code review checklist and feedback format. Apply when reviewing pull requests, diffs, or when the user asks for a code review.
+context: true
+priority: high
+scope: project
+---
+
+# Code Review Rules
+
+When performing a code review, apply this checklist and feedback format.
+
+## Standards Reference
+
+Apply project conventions from `AGENTS.md` / `.cursor/rules/cursor.mdc`: standalone components, signals, `input()`/`output()`, OnPush, native control flow, Reactive forms, accessibility (AXE, WCAG AA), color palette (`var(--color-*)`).
+
+## Review Checklist
+
+- [ ] **Logic**: Correct behavior, edge cases, error handling
+- [ ] **Security**: No SQL injection, XSS, unsafe bindings, or exposed secrets
+- [ ] **Angular**: Standalone, signals, `inject()`, no NgModules legacy patterns
+- [ ] **Accessibility**: Semantic HTML, ARIA where needed, focus management, contrast
+- [ ] **Types**: No `any`; use proper typing or `unknown`
+- [ ] **Templates**: `@if`/`@for`/`@switch`, async pipe, no globals (e.g. `new Date()`)
+- [ ] **State**: Pure signal updates (`update`/`set`), no `mutate`
+- [ ] **Colors**: Use `var(--color-*)` only; no hardcoded palette colors
+- [ ] **Tests**: Changes covered by tests where appropriate
+
+## Feedback Format
+
+- 🔴 **Critical**: Must fix before merge
+- 🟡 **Suggestion**: Should improve
+- 🟢 **Nice to have**: Optional enhancement
+
+## Output
+
+Group findings by severity. Quote relevant code snippets. Prefer actionable fixes over lengthy explanations.

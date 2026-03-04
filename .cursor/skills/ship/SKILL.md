@@ -117,6 +117,7 @@ Code review ready. When you approve, reply with **approve** or **yes** to merge 
 
 ## Safety Rules
 
+- **Never close a PR** to change the target branch. Use `gh pr edit <PR> --base main` (or the correct base) instead. Closing PRs is irreversible and loses discussion history.
 - **Never force push** (`--force` or `-f`)
 - **Never commit secrets** (`.env`, credentials, API keys)
 - **Never skip tests** — if tests fail, stop and fix

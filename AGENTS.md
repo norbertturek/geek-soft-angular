@@ -1,5 +1,13 @@
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
+## Imports
+
+- Use path aliases: `@app/*` for app-wide, `@core/*` for core (models, services, stores). Examples:
+  - `import { Order } from '@core/models/order.model'`
+  - `import { ThemeToggleComponent } from '@core/theme/theme-toggle.component'`
+  - `import { appConfig } from '@app/app.config'`
+- Do not use relative imports like `../` when crossing feature/core boundaries; prefer aliases instead
+
 ## TypeScript Best Practices
 
 - Use strict type checking

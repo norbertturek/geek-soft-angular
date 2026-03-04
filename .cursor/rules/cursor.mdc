@@ -6,6 +6,11 @@ scope: project
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
+## Imports
+
+- Use `@app/*` for app-wide, `@core/*` for core. Examples: `@core/models/order.model`, `@core/theme/theme.service`, `@app/app.config`
+- Prefer aliases over relative `../` when crossing feature/core boundaries
+
 ## TypeScript Best Practices
 
 - Use strict type checking

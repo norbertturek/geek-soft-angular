@@ -126,7 +126,7 @@ export class OrdersStore {
     });
   }
 
-  loadAll(): void {
+  loadOrders(): void {
     this.cancelLoad$.next();
     this.loading.set(true);
     this.error.set(null);
@@ -149,10 +149,6 @@ export class OrdersStore {
       });
   }
 
-  loadOrders(): void {
-    this.loadAll();
-  }
-
   removeOrder(id: number): void {
     this.orders.update((list) => list.filter((o) => o.id !== id));
   }
@@ -161,7 +157,7 @@ export class OrdersStore {
     this.orders.update((list) => list.filter((o) => o.symbol !== symbol));
   }
 
-  addOrder(payload: Omit<Order, 'id' | 'swap'>): void {
+  addOrder(payload: Omit<Order, 'id' | 'swap'>): number {
     const maxId = Math.max(0, ...this.orders().map((o) => o.id));
     const order: Order = {
       ...payload,
@@ -169,5 +165,6 @@ export class OrdersStore {
       swap: 0,
     };
     this.orders.update((list) => [...list, order]);
+    return order.id;
   }
 }

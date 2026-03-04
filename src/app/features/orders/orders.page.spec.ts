@@ -18,7 +18,7 @@ describe('OrdersPage', () => {
       loadOrders: () => {
         loadOrdersCalled = true;
       },
-      addOrder: () => {},
+      addOrder: () => 1,
     };
 
     await TestBed.configureTestingModule({

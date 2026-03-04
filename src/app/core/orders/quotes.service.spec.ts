@@ -3,19 +3,39 @@ import { PLATFORM_ID } from '@angular/core';
 import { QuotesService } from '@core/orders/quotes.service';
 
 const sentMessages: { p: string; d: string[] }[] = [];
+let mockWsInstance: MockWsInstance | null = null;
 let mockWsOnMessage: ((e: { data: string }) => void) | null = null;
+
+interface MockWsInstance {
+  readyState: number;
+  onopen: (() => void) | null;
+  onclose: (() => void) | null;
+  onerror: (() => void) | null;
+  onmessage: ((e: { data: string }) => void) | null;
+  send(msg: string): void;
+  close(): void;
+  simulateOpen(): void;
+  simulateClose(): void;
+}
 
 function installMockWebSocket(): void {
   const MockWs = class {
     static readonly OPEN = 1;
+    static readonly CONNECTING = 0;
+    readyState = 0;
+    onopen: (() => void) | null = null;
+    onclose: (() => void) | null = null;
+    onerror: (() => void) | null = null;
     private _onmessage: ((e: { data: string }) => void) | null = null;
+
     constructor() {
+      mockWsInstance = this as unknown as MockWsInstance;
+      // Simulate async open by default
       queueMicrotask(() => {
-        this.readyState = 1;
-        (this as { onopen?: () => void }).onopen?.();
+        this.simulateOpen();
       });
     }
-    readyState = 0;
+
     set onmessage(fn: ((e: { data: string }) => void) | null) {
       this._onmessage = fn;
       mockWsOnMessage = fn;
@@ -23,7 +43,6 @@ function installMockWebSocket(): void {
     get onmessage() {
       return this._onmessage;
     }
-    onopen: (() => void) | null = null;
 
     send(msg: string): void {
       try {
@@ -33,7 +52,22 @@ function installMockWebSocket(): void {
         /* ignore */
       }
     }
-    close(): void {}
+
+    close(): void {
+      this.readyState = 3;
+    }
+
+    simulateOpen(): void {
+      if (this.readyState === 0) {
+        this.readyState = 1;
+        this.onopen?.();
+      }
+    }
+
+    simulateClose(): void {
+      this.readyState = 3;
+      this.onclose?.();
+    }
   };
   (globalThis as unknown as { WebSocket: typeof MockWs }).WebSocket = MockWs;
 }
@@ -45,6 +79,7 @@ describe('QuotesService', () => {
   beforeEach(() => {
     sentMessages.length = 0;
     mockWsOnMessage = null;
+    mockWsInstance = null;
     originalWs = globalThis.WebSocket;
     installMockWebSocket();
 
@@ -66,9 +101,15 @@ describe('QuotesService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('should set connected to true on open', async () => {
+    service.connect();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(service.connected()).toBe(true);
+  });
+
   it('should send addlist when subscribing', async () => {
     service.connect();
-    await new Promise((r) => setTimeout(r, 10)); // let onopen run
+    await new Promise((r) => setTimeout(r, 10));
     service.subscribe(['BTCUSD', 'ETHUSD']);
     expect(sentMessages).toContainEqual({
       p: '/subscribe/addlist',
@@ -101,5 +142,68 @@ describe('QuotesService', () => {
       });
     }
     expect(service.quotes().get('BTCUSD')).toBe(70000);
+  });
+
+  it('should not create duplicate connections while connecting', async () => {
+    service.connect();
+    const firstInstance = mockWsInstance;
+    service.connect(); // call again while CONNECTING
+    expect(mockWsInstance).toBe(firstInstance);
+  });
+
+  it('should set connected to false on close', async () => {
+    service.connect();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(service.connected()).toBe(true);
+
+    mockWsInstance?.simulateClose();
+    expect(service.connected()).toBe(false);
+  });
+
+  it('should reconnect after close with exponential backoff', async () => {
+    vi.useFakeTimers();
+
+    service.connect();
+    await vi.advanceTimersByTimeAsync(10); // let onopen fire
+    expect(service.connected()).toBe(true);
+
+    // Subscribe to a symbol before disconnect
+    service.subscribe(['BTCUSD']);
+    sentMessages.length = 0;
+
+    // Simulate connection drop
+    mockWsInstance?.simulateClose();
+    expect(service.connected()).toBe(false);
+
+    // Advance past first reconnect delay (1000ms)
+    await vi.advanceTimersByTimeAsync(1_000);
+    // New WS was created, let it open
+    await vi.advanceTimersByTimeAsync(10);
+    expect(service.connected()).toBe(true);
+
+    // Should have re-subscribed to BTCUSD automatically
+    expect(sentMessages).toContainEqual({
+      p: '/subscribe/addlist',
+      d: ['BTCUSD'],
+    });
+
+    vi.useRealTimers();
+  });
+
+  it('should not reconnect after explicit disconnect', async () => {
+    vi.useFakeTimers();
+
+    service.connect();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(service.connected()).toBe(true);
+
+    service.disconnect();
+    expect(service.connected()).toBe(false);
+
+    // Advance well past any reconnect delay
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(service.connected()).toBe(false);
+
+    vi.useRealTimers();
   });
 });

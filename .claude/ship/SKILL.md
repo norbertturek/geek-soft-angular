@@ -48,14 +48,7 @@ Before anything, validate the changes are ready to ship:
 2. Create and switch to the branch: `git checkout -b <branch-name>`
 3. Stage relevant files: `git add <specific files>` (never `git add .` or `git add -A`)
    - **Never stage** `.env`, credentials, or secrets files
-4. Commit with the drafted message using a HEREDOC:
-   ```
-   git commit -m "$(cat <<'EOF'
-   feat(scope): description
-
-   Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
-   EOF
-   )"
+4. Commit with the drafted message. Do not add Co-Authored-By or AI attribution.
    ```
 5. Push the branch: `git push -u origin <branch-name>`
 
@@ -76,8 +69,6 @@ gh pr create --title "feat(scope): description" --body "$(cat <<'EOF'
 - [ ] Type checking passes
 - [ ] Linting passes
 - [ ] Manual verification (if applicable)
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
 ```

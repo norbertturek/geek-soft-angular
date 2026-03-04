@@ -31,16 +31,20 @@ describe('OrdersTableComponent', () => {
   const mockStore = {
     removeOrder: vi.fn(),
     removeGroup: vi.fn(),
-  } as unknown as OrdersStore;
+  };
 
   const mockNotification = {
     show: vi.fn(),
-  } as unknown as NotificationService;
+  };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     await TestBed.configureTestingModule({
       imports: [OrdersTableComponent],
+      providers: [
+        { provide: OrdersStore, useValue: mockStore },
+        { provide: NotificationService, useValue: mockNotification },
+      ],
     }).compileComponents();
   });
 
@@ -48,8 +52,6 @@ describe('OrdersTableComponent', () => {
     const fixture = TestBed.createComponent(OrdersTableComponent);
     fixture.componentRef.setInput('groupedOrders', mockGroupedOrders);
     fixture.componentRef.setInput('orderProfits', mockOrderProfits);
-    fixture.componentRef.setInput('store', mockStore);
-    fixture.componentRef.setInput('notification', mockNotification);
     fixture.detectChanges();
     return fixture;
   }
@@ -73,8 +75,6 @@ describe('OrdersTableComponent', () => {
     const fixture = TestBed.createComponent(OrdersTableComponent);
     fixture.componentRef.setInput('groupedOrders', []);
     fixture.componentRef.setInput('orderProfits', new Map());
-    fixture.componentRef.setInput('store', mockStore);
-    fixture.componentRef.setInput('notification', mockNotification);
     fixture.detectChanges();
 
     const el = fixture.nativeElement as HTMLElement;

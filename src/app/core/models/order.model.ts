@@ -39,4 +39,5 @@ export interface GroupedOrder {
   avgOpenPrice: number;
   sumSize: number;
   sumSwap: number;
+  sumProfit: number;
 }

@@ -32,6 +32,7 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
           <th scope="col" [class]="headerCellClass">Side</th>
           <th scope="col" [class]="headerCellClass">Size</th>
           <th scope="col" [class]="headerCellClass">Swap</th>
+          <th scope="col" [class]="headerCellClass">Profit</th>
           <th scope="col" [class]="headerCellClass" class="w-12">
             <span class="sr-only">Actions</span>
           </th>
@@ -40,7 +41,7 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
       <tbody>
         @if (groupedOrders().length === 0) {
           <tr [class]="rowClass">
-            <td colspan="7" [class]="cellClass">No orders</td>
+            <td colspan="8" [class]="cellClass">No orders</td>
           </tr>
         } @else {
           @for (group of groupedOrders(); track group.symbol) {
@@ -61,6 +62,9 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
               <td [class]="cellClass" aria-hidden="true"></td>
               <td [class]="cellClass">{{ group.sumSize | number:'1.2-8' }}</td>
               <td [class]="cellClass">{{ group.sumSwap | number:'1.2-8' }}</td>
+              <td [class]="cellClass" [style.color]="profitColor(group.sumProfit)">
+                {{ group.sumProfit | number:'1.2-2' }}
+              </td>
               <td [class]="cellClass">
                 <button
                   type="button"
@@ -81,6 +85,9 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
                   <td [class]="cellClass">{{ order.side }}</td>
                   <td [class]="cellClass">{{ order.size | number:'1.2-8' }}</td>
                   <td [class]="cellClass">{{ order.swap | number:'1.2-8' }}</td>
+                  <td [class]="cellClass" [style.color]="profitColor(orderProfits().get(order.id) ?? 0)">
+                    {{ (orderProfits().get(order.id) ?? 0) | number:'1.2-2' }}
+                  </td>
                   <td [class]="cellClass">
                     <button
                       type="button"
@@ -102,10 +109,17 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
 })
 export class OrdersTableComponent {
   readonly groupedOrders = input.required<GroupedOrder[]>();
+  readonly orderProfits = input.required<Map<number, number>>();
   readonly store = input.required<OrdersStore>();
   readonly notification = input.required<NotificationService>();
 
   protected readonly expandedGroups = signal<Set<string>>(new Set());
+
+  protected profitColor(profit: number): string {
+    return profit >= 0
+      ? 'var(--color-profit-positive)'
+      : 'var(--color-profit-negative)';
+  }
   protected readonly cellClass = CELL_CLASS;
   protected readonly headerCellClass = HEADER_CELL_CLASS;
   protected readonly rowClass = ROW_CLASS;

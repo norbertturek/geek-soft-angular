@@ -21,6 +21,7 @@ import { NewOrderFormComponent } from '@app/features/orders/new-order-form.compo
       />
       <app-orders-table
         [groupedOrders]="store.groupedOrders()"
+        [orderProfits]="store.orderProfits()"
         [store]="store"
         [notification]="notification"
       />

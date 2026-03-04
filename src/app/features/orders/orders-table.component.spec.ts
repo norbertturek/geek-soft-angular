@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { OrdersTableComponent } from '@app/features/orders/orders-table.component';
 import type { GroupedOrder } from '@core/models/order.model';
+import { OrdersStore } from '@core/orders/orders.store';
+import { NotificationService } from '@core/notification/notification.service';
 
 describe('OrdersTableComponent', () => {
   const mockGroupedOrders: GroupedOrder[] = [
@@ -23,24 +25,37 @@ describe('OrdersTableComponent', () => {
     },
   ];
 
+  const mockStore = {
+    removeOrder: () => {},
+    removeGroup: () => {},
+  } as unknown as OrdersStore;
+
+  const mockNotification = {
+    show: () => {},
+  } as unknown as NotificationService;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [OrdersTableComponent],
     }).compileComponents();
   });
 
-  it('should create', () => {
+  function createFixture() {
     const fixture = TestBed.createComponent(OrdersTableComponent);
     fixture.componentRef.setInput('groupedOrders', mockGroupedOrders);
+    fixture.componentRef.setInput('store', mockStore);
+    fixture.componentRef.setInput('notification', mockNotification);
     fixture.detectChanges();
+    return fixture;
+  }
+
+  it('should create', () => {
+    const fixture = createFixture();
     expect(fixture.componentInstance).toBeTruthy();
   });
 
   it('should render table with grouped order data', () => {
-    const fixture = TestBed.createComponent(OrdersTableComponent);
-    fixture.componentRef.setInput('groupedOrders', mockGroupedOrders);
-    fixture.detectChanges();
-
+    const fixture = createFixture();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('BTCUSD');
     expect(el.textContent).toContain('(1)');
@@ -52,6 +67,8 @@ describe('OrdersTableComponent', () => {
   it('should show empty state when groupedOrders is empty', () => {
     const fixture = TestBed.createComponent(OrdersTableComponent);
     fixture.componentRef.setInput('groupedOrders', []);
+    fixture.componentRef.setInput('store', mockStore);
+    fixture.componentRef.setInput('notification', mockNotification);
     fixture.detectChanges();
 
     const el = fixture.nativeElement as HTMLElement;

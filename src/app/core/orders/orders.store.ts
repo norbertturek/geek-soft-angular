@@ -60,4 +60,12 @@ export class OrdersStore {
       },
     });
   }
+
+  removeOrder(id: number): void {
+    this.orders.update((list) => list.filter((o) => o.id !== id));
+  }
+
+  removeGroup(symbol: string): void {
+    this.orders.update((list) => list.filter((o) => o.symbol !== symbol));
+  }
 }

@@ -45,6 +45,6 @@ describe('OrdersTableComponent', () => {
     fixture.detectChanges();
 
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Brak zleceń');
+    expect(el.textContent).toContain('No orders');
   });
 });

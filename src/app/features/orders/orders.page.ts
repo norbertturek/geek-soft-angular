@@ -7,9 +7,9 @@ import { OrdersTableComponent } from '@app/features/orders/orders-table.componen
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [OrdersTableComponent],
   template: `
-    <h1 class="text-[var(--color-text)]">Zlecenia</h1>
+    <h1 class="text-[var(--color-text)]">Orders</h1>
     @if (store.loading()) {
-      <p class="text-[var(--color-text)]">Ładowanie zleceń...</p>
+      <p class="text-[var(--color-text)]">Loading orders...</p>
     } @else if (store.error()) {
       <p class="text-[var(--color-text)]" role="alert">{{ store.error() }}</p>
     } @else {

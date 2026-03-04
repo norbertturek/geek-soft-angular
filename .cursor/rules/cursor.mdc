@@ -44,6 +44,13 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Do NOT use `ngStyle`, use `style` bindings instead
 - When using external templates/styles, use paths relative to the component TS file.
 
+## Styling / Tailwind CSS
+
+- Use **Tailwind CSS** for styling. Prefer utility classes over custom CSS.
+- Use `class` bindings with Tailwind (e.g. `class="p-4 flex gap-2"`).
+- For palette colors: `text-[var(--color-text)]`, `bg-[var(--color-row-bg)]`, `hover:bg-[var(--color-row-bg-hover)]`.
+- Avoid component `styles`; use Tailwind in templates. One-off overrides: `[property:value]`.
+
 ## State Management
 
 - Use signals for local component state

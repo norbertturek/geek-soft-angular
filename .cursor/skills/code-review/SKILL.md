@@ -14,7 +14,7 @@ description: Review code for quality, security, and Angular best practices follo
 
 ## Standards Reference
 
-Apply the project's conventions from `AGENTS.md` / `.cursor/rules/cursor.mdc`: standalone components, signals, `input()`/`output()`, `OnPush`, native control flow, Reactive forms, accessibility (AXE, WCAG AA), etc.
+Apply the project's conventions from `AGENTS.md` / `.cursor/rules/cursor.mdc`: standalone components, signals, `input()`/`output()`, `OnPush`, native control flow, Reactive forms, **Tailwind CSS**, accessibility (AXE, WCAG AA), etc.
 
 ## Review Checklist
 
@@ -25,6 +25,7 @@ Apply the project's conventions from `AGENTS.md` / `.cursor/rules/cursor.mdc`: s
 - [ ] **Types**: No `any`; use proper typing or `unknown`
 - [ ] **Templates**: `@if`/`@for`/`@switch`, async pipe, no globals (e.g. `new Date()`)
 - [ ] **State**: Pure signal updates (`update`/`set`), no `mutate`
+- [ ] **Styling**: Tailwind CSS utility classes; palette via `[var(--color-*)]`
 - [ ] **Tests**: Changes covered by tests where appropriate
 
 ## Feedback Format

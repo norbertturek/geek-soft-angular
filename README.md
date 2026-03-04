@@ -22,9 +22,13 @@ src/app/
 
 Przykład: `import { Order } from '@core/models/order.model'`
 
+## Styling
+
+Projekt używa **Tailwind CSS** (utility-first). Kolory z palety projektowej: `text-[var(--color-text)]`, `bg-[var(--color-row-bg)]`, itd.
+
 ## Konwencje
 
-Zobacz [AGENTS.md](./AGENTS.md) dla zasad Angular, TypeScript, dostępności i palety kolorów.
+Zobacz [AGENTS.md](./AGENTS.md) dla zasad Angular, TypeScript, Tailwind, dostępności i palety kolorów.
 
 ## Development server
 

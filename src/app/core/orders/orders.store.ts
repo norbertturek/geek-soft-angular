@@ -11,22 +11,24 @@ function groupOrdersBySymbol(orders: Order[]): GroupedOrder[] {
     list.push(o);
     bySymbol.set(o.symbol, list);
   }
-  return Array.from(bySymbol.entries()).map(([symbol, symbolOrders]) => {
-    const sumSize = symbolOrders.reduce((acc, o) => acc + o.size, 0);
-    const sumSwap = symbolOrders.reduce((acc, o) => acc + o.swap, 0);
-    const avgOpenPrice =
-      symbolOrders.length > 0
-        ? symbolOrders.reduce((acc, o) => acc + o.openPrice, 0) /
-          symbolOrders.length
-        : 0;
-    return {
-      symbol,
-      orders: symbolOrders,
-      avgOpenPrice,
-      sumSize,
-      sumSwap,
-    };
-  });
+  return Array.from(bySymbol.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([symbol, symbolOrders]) => {
+      const sumSize = symbolOrders.reduce((acc, o) => acc + o.size, 0);
+      const sumSwap = symbolOrders.reduce((acc, o) => acc + o.swap, 0);
+      const avgOpenPrice =
+        symbolOrders.length > 0
+          ? symbolOrders.reduce((acc, o) => acc + o.openPrice, 0) /
+            symbolOrders.length
+          : 0;
+      return {
+        symbol,
+        orders: [...symbolOrders],
+        avgOpenPrice,
+        sumSize,
+        sumSwap,
+      };
+    });
 }
 
 @Injectable({ providedIn: 'root' })

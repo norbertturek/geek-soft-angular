@@ -81,7 +81,7 @@ describe('OrdersStore', () => {
     expect(btc).toBeDefined();
     expect(btc!.orders).toHaveLength(2);
     expect(btc!.avgOpenPrice).toBe(150); // (100 + 200) / 2
-    expect(btc!.sumSize).toBe(0.08); // 0.05 + 0.03
+    expect(btc!.sumSize).toBeCloseTo(0.08); // 0.05 + 0.03
     expect(btc!.sumSwap).toBeCloseTo(0.001); // -0.001 + 0.002
 
     const eur = grouped.find((g) => g.symbol === 'EURUSD');

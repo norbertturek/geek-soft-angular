@@ -11,6 +11,7 @@ describe('OrdersPage', () => {
     const store = {
       orders: signal([]),
       groupedOrders: signal([]),
+      orderProfits: signal(new Map<number, number>()),
       uniqueSymbols: signal<string[]>([]),
       loading: signal(false),
       error: signal<string | null>(null),

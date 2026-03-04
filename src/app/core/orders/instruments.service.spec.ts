@@ -68,7 +68,7 @@ describe('InstrumentsService', () => {
     );
     const instReq = httpCtrl.expectOne(INSTRUMENTS_API_URL);
     const ctReq = httpCtrl.expectOne(CONTRACT_TYPES_API_URL);
-    ctReq.flush([]);
+    ctReq.flush([]); // complete first so forkJoin doesn't cancel it
     instReq.flush('Server error', {
       status: 500,
       statusText: 'Internal Server Error',

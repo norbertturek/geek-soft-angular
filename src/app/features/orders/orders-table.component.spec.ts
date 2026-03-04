@@ -22,8 +22,11 @@ describe('OrdersTableComponent', () => {
       avgOpenPrice: 104837.47,
       sumSize: 0.05,
       sumSwap: -0.00147939,
+      sumProfit: 100,
     },
   ];
+
+  const mockOrderProfits = new Map<number, number>([[1, 100]]);
 
   const mockStore = {
     removeOrder: vi.fn(),
@@ -44,6 +47,7 @@ describe('OrdersTableComponent', () => {
   function createFixture() {
     const fixture = TestBed.createComponent(OrdersTableComponent);
     fixture.componentRef.setInput('groupedOrders', mockGroupedOrders);
+    fixture.componentRef.setInput('orderProfits', mockOrderProfits);
     fixture.componentRef.setInput('store', mockStore);
     fixture.componentRef.setInput('notification', mockNotification);
     fixture.detectChanges();
@@ -68,6 +72,7 @@ describe('OrdersTableComponent', () => {
   it('should show empty state when groupedOrders is empty', () => {
     const fixture = TestBed.createComponent(OrdersTableComponent);
     fixture.componentRef.setInput('groupedOrders', []);
+    fixture.componentRef.setInput('orderProfits', new Map());
     fixture.componentRef.setInput('store', mockStore);
     fixture.componentRef.setInput('notification', mockNotification);
     fixture.detectChanges();

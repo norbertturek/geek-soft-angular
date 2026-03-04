@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { OrdersStore } from '@core/orders/orders.store';
+import { NotificationService } from '@core/notification/notification.service';
 import { OrdersTableComponent } from '@app/features/orders/orders-table.component';
 import { NewOrderFormComponent } from '@app/features/orders/new-order-form.component';
 
@@ -18,12 +19,17 @@ import { NewOrderFormComponent } from '@app/features/orders/new-order-form.compo
         [symbols]="store.uniqueSymbols()"
         (orderAdded)="onOrderAdded($event)"
       />
-      <app-orders-table [groupedOrders]="store.groupedOrders()" />
+      <app-orders-table
+        [groupedOrders]="store.groupedOrders()"
+        [store]="store"
+        [notification]="notification"
+      />
     }
   `,
 })
 export class OrdersPage implements OnInit {
   protected readonly store = inject(OrdersStore);
+  protected readonly notification = inject(NotificationService);
 
   ngOnInit(): void {
     this.store.loadOrders();

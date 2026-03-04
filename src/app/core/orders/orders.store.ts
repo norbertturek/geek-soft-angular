@@ -69,6 +69,14 @@ export class OrdersStore {
     });
   }
 
+  removeOrder(id: number): void {
+    this.orders.update((list) => list.filter((o) => o.id !== id));
+  }
+
+  removeGroup(symbol: string): void {
+    this.orders.update((list) => list.filter((o) => o.symbol !== symbol));
+  }
+
   addOrder(payload: Omit<Order, 'id' | 'swap'>): void {
     const maxId = Math.max(0, ...this.orders().map((o) => o.id));
     const order: Order = {

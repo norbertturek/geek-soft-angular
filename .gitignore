@@ -44,6 +44,9 @@ __screenshots__/
 Thumbs.db
 
 # Generated / local
+.env
+.env.local
+.env.*.local
 .web-codegen-scorer/
 .gemini/
 safety-web.log

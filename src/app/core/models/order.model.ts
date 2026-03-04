@@ -14,3 +14,11 @@ export interface Order {
 export interface OrdersApiResponse {
   data: Order[];
 }
+
+export interface GroupedOrder {
+  symbol: string;
+  orders: Order[];
+  avgOpenPrice: number;
+  sumSize: number;
+  sumSwap: number;
+}

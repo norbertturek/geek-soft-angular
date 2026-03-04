@@ -1,5 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { OrdersStore } from '@core/orders/orders.store';
+import { QuotesService } from '@core/orders/quotes.service';
 import { NotificationService } from '@core/notification/notification.service';
 import { OrdersTableComponent } from '@app/features/orders/orders-table.component';
 import { NewOrderFormComponent } from '@app/features/orders/new-order-form.component';
@@ -31,9 +38,15 @@ import { NewOrderFormComponent } from '@app/features/orders/new-order-form.compo
 export class OrdersPage implements OnInit {
   protected readonly store = inject(OrdersStore);
   protected readonly notification = inject(NotificationService);
+  private readonly quotes = inject(QuotesService);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.store.loadOrders();
+  }
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.quotes.disconnect());
   }
 
   protected onOrderAdded(payload: {

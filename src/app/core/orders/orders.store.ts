@@ -1,6 +1,6 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
-import { forkJoin, map, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import type { GroupedOrder, Order, OrderSide } from '@core/models/order.model';
 import { OrdersApiService } from '@core/orders/orders-api.service';
@@ -134,8 +134,8 @@ export class OrdersStore {
       )
       .subscribe({
         next: (data) => {
-        this.orders.set(data);
-        this.loading.set(false);
+          this.orders.set(data);
+          this.loading.set(false);
         },
         error: (err) => {
           this.error.set(err?.message ?? 'Failed to load orders');

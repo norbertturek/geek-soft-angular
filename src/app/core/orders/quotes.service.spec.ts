@@ -68,7 +68,7 @@ describe('QuotesService', () => {
 
   it('should send addlist when subscribing', async () => {
     service.connect();
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10)); // let onopen run
     service.subscribe(['BTCUSD', 'ETHUSD']);
     expect(sentMessages).toContainEqual({
       p: '/subscribe/addlist',

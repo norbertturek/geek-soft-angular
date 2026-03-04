@@ -1,6 +1,30 @@
 # geek-soft-angular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
+Aplikacja Angular do zarządzania zleceniami tradingowymi (orders), zbudowana w Angular 21.
+
+## Struktura projektu
+
+```
+src/app/
+├── core/           # Serwisy, store, modele współdzielone
+│   ├── models/     # Typy (Order, itp.)
+│   ├── orders/     # OrdersApiService, OrdersStore
+│   └── theme/      # ThemeService, ThemeToggleComponent
+├── features/       # Feature modules
+│   └── orders/     # OrdersPage, OrdersTableComponent
+└── app.config.ts, app.routes.ts
+```
+
+## Path aliases
+
+- `@app/*` → `src/app/*`
+- `@core/*` → `src/app/core/*`
+
+Przykład: `import { Order } from '@core/models/order.model'`
+
+## Konwencje
+
+Zobacz [AGENTS.md](./AGENTS.md) dla zasad Angular, TypeScript, dostępności i palety kolorów.
 
 ## Development server
 

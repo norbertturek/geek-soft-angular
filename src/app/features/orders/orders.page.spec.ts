@@ -11,11 +11,13 @@ describe('OrdersPage', () => {
     const store = {
       orders: signal([]),
       groupedOrders: signal([]),
+      uniqueSymbols: signal<string[]>([]),
       loading: signal(false),
       error: signal<string | null>(null),
       loadOrders: () => {
         loadOrdersCalled = true;
       },
+      addOrder: () => {},
     };
 
     await TestBed.configureTestingModule({

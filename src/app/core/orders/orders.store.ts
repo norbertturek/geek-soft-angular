@@ -44,6 +44,14 @@ export class OrdersStore {
     groupOrdersBySymbol(this.orders())
   );
 
+  readonly uniqueSymbols = computed<string[]>(() => {
+    const seen = new Set<string>();
+    for (const o of this.orders()) {
+      seen.add(o.symbol);
+    }
+    return Array.from(seen).sort((a, b) => a.localeCompare(b));
+  });
+
   loadOrders(): void {
     this.cancelLoad$.next();
     this.loading.set(true);
@@ -67,5 +75,15 @@ export class OrdersStore {
 
   removeGroup(symbol: string): void {
     this.orders.update((list) => list.filter((o) => o.symbol !== symbol));
+  }
+
+  addOrder(payload: Omit<Order, 'id' | 'swap'>): void {
+    const maxId = Math.max(0, ...this.orders().map((o) => o.id));
+    const order: Order = {
+      ...payload,
+      id: maxId + 1,
+      swap: 0,
+    };
+    this.orders.update((list) => [...list, order]);
   }
 }

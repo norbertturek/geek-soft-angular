@@ -13,7 +13,7 @@ import { OrdersTableComponent } from '@app/features/orders/orders-table.componen
     } @else if (store.error()) {
       <p class="text-[var(--color-text)]" role="alert">{{ store.error() }}</p>
     } @else {
-      <app-orders-table [orders]="store.orders()" />
+      <app-orders-table [groupedOrders]="store.groupedOrders()" />
     }
   `,
 })

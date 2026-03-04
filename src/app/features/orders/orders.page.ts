@@ -24,6 +24,7 @@ import { NewOrderFormComponent } from '@app/features/orders/new-order-form.compo
     } @else {
       <app-new-order-form
         [symbols]="store.uniqueSymbols()"
+        [quotes]="quotes.quotes()"
         (orderAdded)="onOrderAdded($event)"
       />
       <div class="overflow-x-auto" role="region" aria-label="Orders table">
@@ -41,7 +42,7 @@ import { NewOrderFormComponent } from '@app/features/orders/new-order-form.compo
 export class OrdersPage implements OnInit {
   protected readonly store = inject(OrdersStore);
   protected readonly notification = inject(NotificationService);
-  private readonly quotes = inject(QuotesService);
+  protected readonly quotes = inject(QuotesService);
   private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {

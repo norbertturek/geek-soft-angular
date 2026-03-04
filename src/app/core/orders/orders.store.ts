@@ -109,6 +109,8 @@ export class OrdersStore {
     effect(() => {
       const symbols = this.uniqueSymbols();
       this.quotesService.connect();
+      // Re-run when connected so subscribe/unsubscribe succeed (WS is async)
+      const isConnected = this.quotesService.connected();
       const toRemove = this.prevQuoteSymbols.filter(
         (s) => !symbols.includes(s)
       );
@@ -117,7 +119,10 @@ export class OrdersStore {
       );
       if (toRemove.length > 0) this.quotesService.unsubscribe(toRemove);
       if (toAdd.length > 0) this.quotesService.subscribe(toAdd);
-      this.prevQuoteSymbols = [...symbols];
+      // Only mark as synced when WS is open; otherwise effect re-runs on connect
+      if (isConnected || (toAdd.length === 0 && toRemove.length === 0)) {
+        this.prevQuoteSymbols = [...symbols];
+      }
     });
   }
 

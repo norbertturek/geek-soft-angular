@@ -1,4 +1,3 @@
-
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
@@ -68,3 +67,7 @@ Profit: use `--color-profit-positive` when value > 0, `--color-profit-negative` 
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## Pull Requests
+
+- **NEVER close a PR.** To change the target branch, use `gh pr edit <PR> --base main`. Closing is irreversible and loses history.

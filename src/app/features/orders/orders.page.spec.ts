@@ -10,6 +10,7 @@ describe('OrdersPage', () => {
     loadOrdersCalled = false;
     const store = {
       orders: signal([]),
+      groupedOrders: signal([]),
       loading: signal(false),
       error: signal<string | null>(null),
       loadOrders: () => {

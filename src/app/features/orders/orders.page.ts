@@ -27,6 +27,7 @@ import { NewOrderFormComponent } from '@app/features/orders/new-order-form.compo
         (orderAdded)="onOrderAdded($event)"
       />
       <app-orders-table
+        ngSkipHydration
         [groupedOrders]="store.groupedOrders()"
         [orderProfits]="store.orderProfits()"
         [store]="store"

@@ -1,11 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  effect,
   inject,
   input,
   output,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { tap } from 'rxjs';
 import type { OrderSide } from '@core/models/order.model';
 
 const MIN_POSITIVE = 0.00000001;
@@ -99,6 +103,7 @@ export interface NewOrderPayload {
 })
 export class NewOrderFormComponent {
   readonly symbols = input.required<string[]>();
+  readonly quotes = input<Map<string, number>>(new Map());
   readonly orderAdded = output<NewOrderPayload>();
 
   readonly form = inject(FormBuilder).group({
@@ -107,6 +112,33 @@ export class NewOrderFormComponent {
     size: [null as number | null, [Validators.required, Validators.min(MIN_POSITIVE)]],
     openPrice: [null as number | null, [Validators.required, Validators.min(MIN_POSITIVE)]],
   });
+
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    // Prefill openPrice from current quote when symbol or quotes change
+    effect(() => {
+      const symbol = this.form.get('symbol')?.value ?? '';
+      const quotesMap = this.quotes();
+      const bid = symbol ? quotesMap.get(symbol) : undefined;
+      if (bid != null && typeof bid === 'number') {
+        this.form.patchValue({ openPrice: bid }, { emitEvent: false });
+      }
+    });
+    this.form
+      .get('symbol')
+      ?.valueChanges?.pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap((symbol: string | null) => {
+          const s = symbol ?? '';
+          const bid = s ? this.quotes().get(s) : undefined;
+          if (bid != null && typeof bid === 'number') {
+            this.form.patchValue({ openPrice: bid }, { emitEvent: false });
+          }
+        })
+      )
+      ?.subscribe();
+  }
 
   protected onSubmit(): void {
     if (this.form.invalid) return;

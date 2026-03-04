@@ -36,8 +36,8 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
           <th scope="col" [class]="headerCellClass">Open Time</th>
           <th scope="col" [class]="headerCellClass">Open Price</th>
           <th scope="col" [class]="headerCellClass">Side</th>
-          <th scope="col" [class]="headerCellClass">Size</th>
           <th scope="col" [class]="headerCellClass">Swap</th>
+          <th scope="col" [class]="headerCellClass">Size</th>
           <th scope="col" [class]="headerCellClass">Profit</th>
           <th scope="col" [class]="headerCellClass + ' ' + stickyHeaderCellClass">Close</th>
         </tr>
@@ -64,8 +64,8 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
               </th>
               <td [class]="cellClass">{{ group.avgOpenPrice | number:'1.2-2' }}</td>
               <td [class]="cellClass" aria-hidden="true"></td>
-              <td [class]="cellClass">{{ group.sumSize | number:'1.2-8' }}</td>
               <td [class]="cellClass">{{ group.sumSwap | number:'1.2-8' }}</td>
+              <td [class]="cellClass">{{ group.sumSize | number:'1.2-8' }}</td>
               <td [class]="cellClass" [style.color]="profitColor(group.sumProfit)">
                 {{ group.sumProfit | number:'1.2-2' }}
               </td>
@@ -87,8 +87,8 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
                   <td [class]="cellClass">{{ order.openTime | date:openTimeFormat }}</td>
                   <td [class]="cellClass">{{ order.openPrice | number:'1.2-2' }}</td>
                   <td [class]="cellClass">{{ order.side }}</td>
-                  <td [class]="cellClass">{{ order.size | number:'1.2-8' }}</td>
                   <td [class]="cellClass">{{ order.swap | number:'1.2-8' }}</td>
+                  <td [class]="cellClass">{{ order.size | number:'1.2-8' }}</td>
                   <td [class]="cellClass" [style.color]="profitColor(orderProfits().get(order.id) ?? 0)">
                     {{ (orderProfits().get(order.id) ?? 0) | number:'1.2-2' }}
                   </td>

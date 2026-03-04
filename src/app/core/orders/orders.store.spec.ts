@@ -15,6 +15,7 @@ const mockQuotes = {
   connect: () => {},
   subscribe: () => {},
   unsubscribe: () => {},
+  connected: () => true,
   quotes: () => new Map<string, number>([['BTCUSD', 105], ['EURUSD', 1.06]]),
 } as unknown as QuotesService;
 

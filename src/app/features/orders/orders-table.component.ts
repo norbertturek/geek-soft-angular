@@ -15,6 +15,12 @@ const ROW_CLASS = 'bg-[var(--color-row-bg)] hover:bg-[var(--color-row-bg-hover)]
 const GROUP_ROW_CLASS =
   'bg-[color-mix(in_srgb,var(--color-text)_8%,var(--color-row-bg))] hover:bg-[color-mix(in_srgb,var(--color-text)_12%,var(--color-row-bg))] font-semibold';
 
+const STICKY_CLOSE_CELL =
+  'sticky right-0 w-14 min-w-14 [box-shadow:-4px_0_8px_var(--color-sticky-shadow)]';
+const STICKY_HEADER_CELL = `${STICKY_CLOSE_CELL} bg-[var(--color-bg-main)]`;
+const STICKY_GROUP_CELL = `${STICKY_CLOSE_CELL} bg-[color-mix(in_srgb,var(--color-text)_8%,var(--color-row-bg))]`;
+const STICKY_ORDER_CELL = `${STICKY_CLOSE_CELL} bg-[var(--color-row-bg)]`;
+
 const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
 
 @Component({
@@ -33,9 +39,7 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
           <th scope="col" [class]="headerCellClass">Size</th>
           <th scope="col" [class]="headerCellClass">Swap</th>
           <th scope="col" [class]="headerCellClass">Profit</th>
-          <th scope="col" [class]="headerCellClass" class="w-12">
-            <span class="sr-only">Actions</span>
-          </th>
+          <th scope="col" [class]="headerCellClass + ' ' + stickyHeaderCellClass">Close</th>
         </tr>
       </thead>
       <tbody>
@@ -65,14 +69,14 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
               <td [class]="cellClass" [style.color]="profitColor(group.sumProfit)">
                 {{ group.sumProfit | number:'1.2-2' }}
               </td>
-              <td [class]="cellClass">
+              <td [class]="cellClass + ' ' + stickyGroupCellClass">
                 <button
                   type="button"
                   [attr.aria-label]="'Close order no. ' + group.orders.map(o => o.id).join(', ')"
                   (click)="$event.stopPropagation(); onCloseGroup(group.symbol)"
-                  class="p-1 rounded hover:bg-[var(--color-row-bg-hover)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-text)]"
+                  class="min-w-8 min-h-8 p-1.5 rounded border border-[var(--color-text)]/30 hover:bg-[var(--color-row-bg-hover)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-text)] text-lg leading-none font-medium"
                 >
-                  <span aria-hidden="true">&#10005;</span>
+                  <span aria-hidden="true">×</span>
                 </button>
               </td>
             </tr>
@@ -88,14 +92,14 @@ const OPEN_TIME_FORMAT = 'dd.MM.yyyy HH:mm:ss';
                   <td [class]="cellClass" [style.color]="profitColor(orderProfits().get(order.id) ?? 0)">
                     {{ (orderProfits().get(order.id) ?? 0) | number:'1.2-2' }}
                   </td>
-                  <td [class]="cellClass">
+                  <td [class]="cellClass + ' ' + stickyOrderCellClass">
                     <button
                       type="button"
                       [attr.aria-label]="'Close order no. ' + order.id"
                       (click)="onCloseOrder(order.id)"
-                      class="p-1 rounded hover:bg-[var(--color-row-bg-hover)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-text)]"
+                      class="min-w-8 min-h-8 p-1.5 rounded border border-[var(--color-text)]/30 hover:bg-[var(--color-row-bg-hover)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-text)] text-lg leading-none font-medium"
                     >
-                      <span aria-hidden="true">&#10005;</span>
+                      <span aria-hidden="true">×</span>
                     </button>
                   </td>
                 </tr>
@@ -125,6 +129,9 @@ export class OrdersTableComponent {
   protected readonly rowClass = ROW_CLASS;
   protected readonly groupRowClass = GROUP_ROW_CLASS;
   protected readonly openTimeFormat = OPEN_TIME_FORMAT;
+  protected readonly stickyHeaderCellClass = STICKY_HEADER_CELL;
+  protected readonly stickyGroupCellClass = STICKY_GROUP_CELL;
+  protected readonly stickyOrderCellClass = STICKY_ORDER_CELL;
 
   protected isExpanded(symbol: string): boolean {
     return this.expandedGroups().has(symbol);

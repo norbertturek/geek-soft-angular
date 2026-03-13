@@ -25,7 +25,8 @@ src/app/
 │   ├── orders/
 │   │   ├── orders-api.service  # HTTP: fetches orders from REST API
 │   │   ├── orders.store        # Central state: orders signal, grouping, profit calc
-│   │   ├── instruments.service # HTTP: loads contract sizes (needed for profit)
+│   │   └── instruments.service # HTTP: loads contract sizes (needed for profit)
+│   ├── quotes/
 │   │   └── quotes.service      # WebSocket: real-time bid prices per symbol
 │   ├── theme/                  # ThemeService + ThemeToggleComponent (dark mode)
 │   └── notification/           # NotificationService + snackbar component
@@ -39,7 +40,7 @@ src/app/
 
 ### Data Flow
 
-1. `OrdersPage.onInit` → `OrdersStore.loadAll()` → loads instruments (contract sizes), then fetches orders
+1. `OrdersPage.onInit` → `OrdersStore.loadOrders()` → loads instruments (contract sizes), then fetches orders
 2. `OrdersStore` groups orders by symbol and computes profits using `QuotesService` bid prices and instrument contract sizes
 3. `QuotesService` maintains a WebSocket to `wss://webquotes.geeksoft.pl` — an `effect()` in `OrdersStore` auto-subscribes to quote symbols matching loaded orders
 4. Profit formula: `(bid - openPrice) * size * contractSize * sideMultiplier` where BUY=1, SELL=-1

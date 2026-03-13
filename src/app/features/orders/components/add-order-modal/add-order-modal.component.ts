@@ -14,7 +14,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { OrderSide } from '@core/models/order.model';
-import { QuotesService } from '@core/orders/quotes.service';
+import { QuotesService } from '@core/quotes/quotes.service';
+import { SvgIconComponent } from '@shared/components/svg-icon.component';
+import { ButtonComponent } from '@shared/components/button.component';
 
 const MIN_POSITIVE = 0.00000001;
 
@@ -29,7 +31,7 @@ export interface AddOrderPayload {
 @Component({
   selector: 'app-add-order-modal',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SvgIconComponent, ButtonComponent],
   host: {
     '(document:keydown.escape)': 'onEscape()',
   },
@@ -47,34 +49,27 @@ export interface AddOrderPayload {
       ></div>
       <div
         #dialogPanel
-        class="relative z-10 w-full max-w-lg rounded-xl shadow-2xl p-6 bg-[var(--color-card-bg)] border border-[var(--color-border)]"
+        class="relative z-10 w-full max-w-lg rounded-xl shadow-2xl p-6 bg-card-bg border border-border"
         (keydown)="onTrapFocus($event)"
       >
         <div class="flex items-center justify-between mb-6">
-          <h2 id="add-order-title" class="text-2xl font-bold text-[var(--color-text)]">
+          <h2 id="add-order-title" class="text-2xl font-bold text-text">
             Add New Order
           </h2>
-          <button
-            type="button"
-            (click)="onClose()"
-            class="p-2 rounded-lg hover:bg-[var(--color-row-bg-hover)] text-[var(--color-text)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-            aria-label="Close modal"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-            </svg>
-          </button>
+          <app-button variant="ghost" type="button" ariaLabel="Close modal" (clicked)="onClose()">
+            <app-svg-icon name="close-20" [size]="20" />
+          </app-button>
         </div>
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
           <div>
-            <label for="modal-symbol" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-              Symbol <span class="text-[var(--color-profit-negative)]">*</span>
+            <label for="modal-symbol" class="block text-sm font-medium text-text mb-2">
+              Symbol <span class="text-profit-negative">*</span>
             </label>
             <select
               id="modal-symbol"
               formControlName="symbol"
-              [class]="'w-full px-4 py-2.5 rounded-lg bg-[var(--color-input-bg)] text-[var(--color-text)] border ' + (form.get('symbol')?.invalid && form.get('symbol')?.touched ? 'border-[var(--color-profit-negative)]' : 'border-[var(--color-border)]') + ' focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-colors'"
+              [class]="'w-full px-4 py-2.5 rounded-lg bg-input-bg text-text border ' + (form.get('symbol')?.invalid && form.get('symbol')?.touched ? 'border-profit-negative' : 'border-border') + ' focus:outline-none focus:ring-2 focus:ring-primary transition-colors'"
             >
               <option value="">Select a symbol</option>
               @for (s of uniqueSymbols(); track s) {
@@ -82,36 +77,38 @@ export interface AddOrderPayload {
               }
             </select>
             @if (form.get('symbol')?.invalid && form.get('symbol')?.touched) {
-              <p class="text-[var(--color-profit-negative)] text-sm mt-1">Symbol is required</p>
+              <p class="text-profit-negative text-sm mt-1">Symbol is required</p>
             }
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-              Side <span class="text-[var(--color-profit-negative)]">*</span>
+            <label class="block text-sm font-medium text-text mb-2">
+              Side <span class="text-profit-negative">*</span>
             </label>
             <div class="flex gap-3">
-              <button
+              <app-button
                 type="button"
-                (click)="form.patchValue({ side: 'BUY' })"
-                [class]="'flex-1 py-2.5 rounded-lg font-medium transition-colors ' + (form.get('side')?.value === 'BUY' ? 'bg-[var(--color-profit-positive)] text-white' : 'bg-[var(--color-row-bg)] text-[var(--color-text)] hover:bg-[var(--color-row-bg-hover)]')"
+                class="flex-1"
+                [variant]="form.get('side')?.value === 'BUY' ? 'success' : 'secondary'"
+                (clicked)="form.patchValue({ side: 'BUY' })"
               >
                 BUY
-              </button>
-              <button
+              </app-button>
+              <app-button
                 type="button"
-                (click)="form.patchValue({ side: 'SELL' })"
-                [class]="'flex-1 py-2.5 rounded-lg font-medium transition-colors ' + (form.get('side')?.value === 'SELL' ? 'bg-[var(--color-profit-negative)] text-white' : 'bg-[var(--color-row-bg)] text-[var(--color-text)] hover:bg-[var(--color-row-bg-hover)]')"
+                class="flex-1"
+                [variant]="form.get('side')?.value === 'SELL' ? 'danger' : 'secondary'"
+                (clicked)="form.patchValue({ side: 'SELL' })"
               >
                 SELL
-              </button>
+              </app-button>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="modal-size" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                Size <span class="text-[var(--color-profit-negative)]">*</span>
+              <label for="modal-size" class="block text-sm font-medium text-text mb-2">
+                Size <span class="text-profit-negative">*</span>
               </label>
               <input
                 id="modal-size"
@@ -119,17 +116,17 @@ export interface AddOrderPayload {
                 formControlName="size"
                 step="0.01"
                 placeholder="0.00"
-                [class]="'w-full px-4 py-2.5 rounded-lg bg-[var(--color-input-bg)] text-[var(--color-text)] border ' + (form.get('size')?.invalid && form.get('size')?.touched ? 'border-[var(--color-profit-negative)]' : 'border-[var(--color-border)]') + ' placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]'"
+                [class]="'w-full px-4 py-2.5 rounded-lg bg-input-bg text-text border ' + (form.get('size')?.invalid && form.get('size')?.touched ? 'border-profit-negative' : 'border-border') + ' placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary'"
               />
               @if (form.get('size')?.invalid && form.get('size')?.touched) {
-                <p class="text-[var(--color-profit-negative)] text-sm mt-1">
+                <p class="text-profit-negative text-sm mt-1">
                   {{ form.get('size')?.errors?.['required'] ? 'Required' : 'Must be greater than 0' }}
                 </p>
               }
             </div>
             <div>
-              <label for="modal-openPrice" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                Open Price <span class="text-[var(--color-profit-negative)]">*</span>
+              <label for="modal-openPrice" class="block text-sm font-medium text-text mb-2">
+                Open Price <span class="text-profit-negative">*</span>
               </label>
               <input
                 id="modal-openPrice"
@@ -137,28 +134,28 @@ export interface AddOrderPayload {
                 formControlName="openPrice"
                 step="0.01"
                 placeholder="0.00"
-                [class]="'w-full px-4 py-2.5 rounded-lg bg-[var(--color-input-bg)] text-[var(--color-text)] border ' + (form.get('openPrice')?.invalid && form.get('openPrice')?.touched ? 'border-[var(--color-profit-negative)]' : 'border-[var(--color-border)]') + ' placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]'"
+                [class]="'w-full px-4 py-2.5 rounded-lg bg-input-bg text-text border ' + (form.get('openPrice')?.invalid && form.get('openPrice')?.touched ? 'border-profit-negative' : 'border-border') + ' placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary'"
               />
               @if (form.get('openPrice')?.invalid && form.get('openPrice')?.touched) {
-                <p class="text-[var(--color-profit-negative)] text-sm mt-1">
+                <p class="text-profit-negative text-sm mt-1">
                   {{ form.get('openPrice')?.errors?.['required'] ? 'Required' : 'Must be greater than 0' }}
                 </p>
               }
             </div>
           </div>
 
-          <div class="flex gap-3 pt-4">
+          <div class="grid grid-cols-2 gap-4 pt-4">
             <button
               type="button"
               (click)="onClose()"
-              class="flex-1 px-6 py-2.5 bg-[var(--color-row-bg)] text-[var(--color-text)] rounded-lg hover:bg-[var(--color-row-bg-hover)] font-medium transition-colors"
+              class="w-full px-6 py-2.5 bg-row-bg text-text rounded-lg hover:bg-row-bg-hover font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               [disabled]="form.invalid || uniqueSymbols().length === 0"
-              class="flex-1 px-6 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[var(--color-primary)]"
+              class="w-full px-6 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
             >
               Add Order
             </button>

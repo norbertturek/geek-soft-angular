@@ -1,10 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import type { Order } from '@core/models/order.model';
+import { APP_CONFIG } from '@core/config/app-config.token';
 import { OrdersApiService } from '@core/orders/orders-api.service';
 import { InstrumentsService } from '@core/orders/instruments.service';
-import { QuotesService } from '@core/orders/quotes.service';
+import { QuotesService } from '@core/quotes/quotes.service';
 import { OrdersStore } from '@core/orders/orders.store';
+
+const mockAppConfig = {
+  production: false,
+  ordersUrl: '',
+  instrumentsUrl: '',
+  contractTypesUrl: '',
+  quotesWsUrl: '',
+  wsPingIntervalMs: 15000,
+  wsReconnectDelayMs: 1000,
+  wsMaxSubscribedSymbols: 1000,
+  wsSubscribeBatchSize: 100,
+};
 
 const mockInstruments = {
   loadContractSizes: () => of(new Map([['BTCUSD', 1], ['EURUSD', 100000]])),
@@ -56,10 +69,12 @@ describe('OrdersStore', () => {
     TestBed.configureTestingModule({
       providers: [
         OrdersStore,
+        { provide: APP_CONFIG, useValue: mockAppConfig },
         {
           provide: OrdersApiService,
           useValue: { fetchOrders: () => of(mockOrders) },
         },
+        { provide: APP_CONFIG, useValue: mockAppConfig },
         { provide: InstrumentsService, useValue: mockInstruments },
         { provide: QuotesService, useValue: mockQuotes },
       ],
@@ -127,6 +142,7 @@ describe('OrdersStore', () => {
               throwError(() => new Error('Network error')),
           },
         },
+        { provide: APP_CONFIG, useValue: mockAppConfig },
         { provide: InstrumentsService, useValue: mockInstruments },
         { provide: QuotesService, useValue: mockQuotes },
       ],

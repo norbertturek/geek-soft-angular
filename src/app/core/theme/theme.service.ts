@@ -39,9 +39,9 @@ export class ThemeService {
   );
 
   readonly effective = computed<'light' | 'dark'>(() => {
-    const m = this.mode();
-    if (m === 'light') return 'light';
-    if (m === 'dark') return 'dark';
+    const currentMode = this.mode();
+    if (currentMode === 'light') return 'light';
+    if (currentMode === 'dark') return 'dark';
     return isPlatformBrowser(this.platformId) ? getSystemTheme() : 'light';
   });
 

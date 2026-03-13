@@ -6,8 +6,10 @@ import {
 } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
 import type { Order } from '@core/models/order.model';
-import { ORDERS_API_URL } from '@core/orders/orders-api.config';
+import { APP_CONFIG } from '@core/config/app-config.token';
 import { OrdersApiService } from '@core/orders/orders-api.service';
+
+const TEST_ORDERS_URL = 'https://test.example/orders.json';
 
 describe('OrdersApiService', () => {
   let service: OrdersApiService;
@@ -31,6 +33,18 @@ describe('OrdersApiService', () => {
         OrdersApiService,
         provideHttpClient(),
         provideHttpClientTesting(),
+        {
+          provide: APP_CONFIG,
+          useValue: {
+            production: false,
+            ordersUrl: TEST_ORDERS_URL,
+            instrumentsUrl: '',
+            contractTypesUrl: '',
+            quotesWsUrl: '',
+            wsPingIntervalMs: 15000,
+            wsReconnectDelayMs: 1000,
+          },
+        },
       ],
     });
     service = TestBed.inject(OrdersApiService);
@@ -48,7 +62,7 @@ describe('OrdersApiService', () => {
   it('should fetch orders and return mapped Order[]', async () => {
     const ordersPromise = firstValueFrom(service.fetchOrders());
     const req = httpCtrl.expectOne(
-      ORDERS_API_URL
+      TEST_ORDERS_URL
     );
     expect(req.request.method).toBe('GET');
     req.flush({ data: mockOrders });
@@ -62,7 +76,7 @@ describe('OrdersApiService', () => {
   it('should return empty array when data is missing', async () => {
     const ordersPromise = firstValueFrom(service.fetchOrders());
     const req = httpCtrl.expectOne(
-      ORDERS_API_URL
+      TEST_ORDERS_URL
     );
     req.flush({});
 
@@ -73,7 +87,7 @@ describe('OrdersApiService', () => {
   it('should return empty array when data is not an array', async () => {
     const ordersPromise = firstValueFrom(service.fetchOrders());
     const req = httpCtrl.expectOne(
-      ORDERS_API_URL
+      TEST_ORDERS_URL
     );
     req.flush({ data: 'invalid' });
 
@@ -84,7 +98,7 @@ describe('OrdersApiService', () => {
   it('should propagate HTTP errors to subscriber', async () => {
     const ordersPromise = firstValueFrom(service.fetchOrders());
     const req = httpCtrl.expectOne(
-      ORDERS_API_URL
+      TEST_ORDERS_URL
     );
     req.flush('Server error', {
       status: 500,

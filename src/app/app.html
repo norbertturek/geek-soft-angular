@@ -1,15 +1,4 @@
-<a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-20 focus:px-4 focus:py-2 focus:bg-[var(--color-bg-main)] focus:text-[var(--color-text)] focus:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-text)]">Skip to main content</a>
-<header class="fixed top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-[var(--color-bg-main)] border-b border-[var(--color-border)]">
-  <nav class="flex gap-4" aria-label="Main navigation">
-    <a routerLink="/" routerLinkActive="font-semibold" [routerLinkActiveOptions]="{ exact: true }" class="text-[var(--color-text)] no-underline hover:underline">
-      Home
-    </a>
-    <a routerLink="/orders" routerLinkActive="font-semibold" class="text-[var(--color-text)] no-underline hover:underline">
-      Orders
-    </a>
-  </nav>
-  <app-theme-toggle />
-</header>
+<app-app-header />
 <main id="main-content" class="pt-14 min-h-screen p-4">
   <router-outlet />
 </main>

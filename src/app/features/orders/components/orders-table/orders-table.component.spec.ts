@@ -1,8 +1,19 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { OrdersTableComponent } from '@app/features/orders/orders-table.component';
+import { OrdersTableComponent } from '@app/features/orders/components/orders-table/orders-table.component';
 import type { GroupedOrder } from '@core/models/order.model';
 import { OrdersStore } from '@core/orders/orders.store';
 import { NotificationService } from '@core/notification/notification.service';
+
+@Component({
+  selector: 'test-host',
+  template: `<div style="height: 500px; display: flex; flex-direction: column"><app-orders-table [groupedOrders]="groupedOrders" [orderProfits]="orderProfits" [disableVirtualScroll]="true" /></div>`,
+  imports: [OrdersTableComponent],
+})
+class TestHostComponent {
+  groupedOrders: GroupedOrder[] = [];
+  orderProfits = new Map<number, number>();
+}
 
 describe('OrdersTableComponent', () => {
   const mockGroupedOrders: GroupedOrder[] = [
@@ -40,7 +51,7 @@ describe('OrdersTableComponent', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     await TestBed.configureTestingModule({
-      imports: [OrdersTableComponent],
+      imports: [TestHostComponent],
       providers: [
         { provide: OrdersStore, useValue: mockStore },
         { provide: NotificationService, useValue: mockNotification },
@@ -48,21 +59,23 @@ describe('OrdersTableComponent', () => {
     }).compileComponents();
   });
 
-  function createFixture() {
-    const fixture = TestBed.createComponent(OrdersTableComponent);
-    fixture.componentRef.setInput('groupedOrders', mockGroupedOrders);
-    fixture.componentRef.setInput('orderProfits', mockOrderProfits);
+  async function createFixture() {
+    const fixture = TestBed.createComponent(TestHostComponent);
+    fixture.componentInstance.groupedOrders = mockGroupedOrders;
+    fixture.componentInstance.orderProfits = mockOrderProfits;
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
     return fixture;
   }
 
-  it('should create', () => {
-    const fixture = createFixture();
+  it('should create', async () => {
+    const fixture = await createFixture();
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render table with grouped order data', () => {
-    const fixture = createFixture();
+  it('should render table with grouped order data', async () => {
+    const fixture = await createFixture();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('BTCUSD');
     expect(el.textContent).toContain('(1)');
@@ -72,24 +85,24 @@ describe('OrdersTableComponent', () => {
   });
 
   it('should show empty state when groupedOrders is empty', () => {
-    const fixture = TestBed.createComponent(OrdersTableComponent);
-    fixture.componentRef.setInput('groupedOrders', []);
-    fixture.componentRef.setInput('orderProfits', new Map());
+    const fixture = TestBed.createComponent(TestHostComponent);
+    fixture.componentInstance.groupedOrders = [];
+    fixture.componentInstance.orderProfits = new Map();
     fixture.detectChanges();
 
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('No orders');
   });
 
-  it('should not render order rows when group is collapsed', () => {
-    const fixture = createFixture();
+  it('should not render order rows when group is collapsed', async () => {
+    const fixture = await createFixture();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('BTCUSD');
     expect(el.textContent).not.toContain('BUY');
   });
 
-  it('should toggle expanded state and render order rows on group row click', () => {
-    const fixture = createFixture();
+  it('should toggle expanded state and render order rows on group row click', async () => {
+    const fixture = await createFixture();
 
     const el = fixture.nativeElement as HTMLElement;
     const groupRow = el.querySelector('tbody tr');
@@ -107,8 +120,8 @@ describe('OrdersTableComponent', () => {
     expect(el.textContent).not.toContain('BUY');
   });
 
-  it('should expand on Enter key', () => {
-    const fixture = createFixture();
+  it('should expand on Enter key', async () => {
+    const fixture = await createFixture();
 
     const el = fixture.nativeElement as HTMLElement;
     const groupRow = el.querySelector('tbody tr') as HTMLElement;
@@ -120,8 +133,8 @@ describe('OrdersTableComponent', () => {
     expect(el.textContent).toContain('BUY');
   });
 
-  it('should expand on Space key', () => {
-    const fixture = createFixture();
+  it('should expand on Space key', async () => {
+    const fixture = await createFixture();
 
     const el = fixture.nativeElement as HTMLElement;
     const groupRow = el.querySelector('tbody tr') as HTMLElement;
@@ -133,8 +146,8 @@ describe('OrdersTableComponent', () => {
     expect(el.textContent).toContain('BUY');
   });
 
-  it('should call removeGroup and notification.show when close group button clicked', () => {
-    const fixture = createFixture();
+  it('should call removeGroup and notification.show when close group button clicked', async () => {
+    const fixture = await createFixture();
     const el = fixture.nativeElement as HTMLElement;
     const closeBtn = el.querySelector('tbody tr button[type="button"]') as HTMLButtonElement;
     expect(closeBtn).toBeTruthy();
@@ -146,8 +159,8 @@ describe('OrdersTableComponent', () => {
     expect(mockNotification.show).toHaveBeenCalledWith('Closed order no. 1');
   });
 
-  it('should call removeOrder and notification.show when close order button clicked', () => {
-    const fixture = createFixture();
+  it('should call removeOrder and notification.show when close order button clicked', async () => {
+    const fixture = await createFixture();
     const el = fixture.nativeElement as HTMLElement;
     const groupRow = el.querySelector('tbody tr') as HTMLElement;
     groupRow.click();

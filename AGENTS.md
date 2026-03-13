@@ -17,6 +17,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use strict type checking
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
+- Prefer descriptive variable names over abbreviations. Avoid single-letter names (e.g. `s`, `q`) except for short loop indices (`i`, `j`) in narrow scope. When handling external API wire formats with minified keys (e.g. `p`, `d`, `s`, `b`), map them to descriptive names at the boundary via destructuring aliases or adapter functions so application code stays readable
 
 ## Angular Best Practices
 
@@ -27,6 +28,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
 - Use `NgOptimizedImage` for all static images.
   - `NgOptimizedImage` does not work for inline base64 images.
+  - Small SVG icons loaded via `SvgIconComponent` use a plain `<img>` (intentional exception).
 
 ## Accessibility Requirements
 

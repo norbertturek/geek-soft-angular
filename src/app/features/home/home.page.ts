@@ -27,15 +27,15 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
               <clipPath id="a"><path fill="#fff" d="M0 0h982v239H0z" /></clipPath>
             </defs>
           </svg>
-          <h1 id="home-title" class="text-5xl text-[var(--color-text)] font-medium leading-none tracking-tight m-0 mt-7">Hello, {{ title() }}</h1>
-          <p class="m-0 text-[var(--color-text)] mt-6">Congratulations! Your app is running. 🎉</p>
+          <h1 id="home-title" class="text-5xl text-text font-medium leading-none tracking-tight m-0 mt-7">Hello, {{ title() }}</h1>
+          <p class="m-0 text-text mt-6">Congratulations! Your app is running. 🎉</p>
         </div>
-        <div class="w-px mx-2 bg-[var(--color-text)]/30 flex-shrink-0 max-md:w-full max-md:h-px max-md:my-6 max-md:mx-0" aria-hidden="true"></div>
+        <div class="w-px mx-2 bg-text/30 flex-shrink-0 max-md:w-full max-md:h-px max-md:my-6 max-md:mx-0" aria-hidden="true"></div>
         <div>
           <div class="flex flex-col items-start flex-wrap gap-5">
             @for (item of links; track item.title) {
               <a
-                class="flex items-center px-3 py-1.5 rounded-full border-0 bg-[color-mix(in_srgb,var(--color-text)_5%,transparent)] text-[var(--color-text)] hover:bg-[color-mix(in_srgb,var(--color-text)_15%,transparent)] transition-colors duration-300 text-sm font-medium no-underline whitespace-nowrap"
+                class="flex items-center px-3 py-1.5 rounded-full border-0 bg-[color-mix(in_srgb,var(--color-text)_5%,transparent)] text-text hover:bg-[color-mix(in_srgb,var(--color-text)_15%,transparent)] transition-colors duration-300 text-sm font-medium no-underline whitespace-nowrap"
                 [href]="item.link"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -51,7 +51,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
             @for (social of socialLinks; track social.label) {
               <a class="group" [href]="social.href" [attr.aria-label]="social.label" target="_blank" rel="noopener noreferrer">
                 <svg [attr.width]="social.width" [attr.height]="social.height" [attr.viewBox]="social.viewBox" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path class="fill-[var(--color-text)] fill-opacity-70 group-hover:fill-opacity-100 transition-colors duration-300" [attr.d]="social.path" />
+                  <path class="fill-text fill-opacity-70 group-hover:fill-opacity-100 transition-colors duration-300" [attr.d]="social.path" />
                 </svg>
               </a>
             }

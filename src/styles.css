@@ -6,7 +6,7 @@ html {
 }
 
 /* Design tokens - exact values from Create Table UI Design theme.css */
-:root {
+@theme {
   /* Core palette from design */
   --color-bg-main: rgb(233, 237, 241);
   --color-text: rgb(14, 15, 26);
@@ -60,4 +60,24 @@ body {
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Orders table: fixed 75rem width so header and body columns align */
+.orders-table {
+  width: 75rem;
+  min-width: 75rem;
+}
+
+/* Orders table: Symbol–Profit 10rem each, Close 5rem (w-20) */
+.orders-table col:nth-child(1),
+.orders-table col:nth-child(2),
+.orders-table col:nth-child(3),
+.orders-table col:nth-child(4),
+.orders-table col:nth-child(5),
+.orders-table col:nth-child(6),
+.orders-table col:nth-child(7) {
+  width: 10rem;
+}
+.orders-table col:nth-child(8) {
+  width: 5rem;
 }

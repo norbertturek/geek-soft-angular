@@ -41,3 +41,8 @@ export interface GroupedOrder {
   sumSwap: number;
   sumProfit: number;
 }
+
+/** Flattened row for virtual scroll: group row or detail row */
+export type VirtualTableRow =
+  | { kind: 'group'; group: GroupedOrder; id: string }
+  | { kind: 'detail'; order: Order; profit: number; id: string };

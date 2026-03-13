@@ -2,69 +2,19 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 import { switchMap } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import type { GroupedOrder, Order, OrderSide } from '@core/models/order.model';
+import type { GroupedOrder, Order } from '@core/models/order.model';
+import { APP_CONFIG } from '@core/config/app-config.token';
 import { OrdersApiService } from '@core/orders/orders-api.service';
 import { InstrumentsService } from '@core/orders/instruments.service';
-import { QuotesService } from '@core/orders/quotes.service';
+import { QuotesService } from '@core/quotes/quotes.service';
+import { groupOrdersBySymbol, orderProfit } from '@core/utils/order-utils';
 
-function sideMultiplier(side: OrderSide): number {
-  return side === 'BUY' ? 1 : -1;
-}
-
-function orderProfit(
-  order: Order,
-  bid: number,
-  contractSize: number
-): number {
-  return (
-    (bid - order.openPrice) *
-    order.size *
-    contractSize *
-    sideMultiplier(order.side)
-  );
-}
-
-function groupOrdersBySymbol(
-  orders: Order[],
-  quotes: Map<string, number>,
-  getContractSize: (s: string) => number
-): GroupedOrder[] {
-  const bySymbol = new Map<string, Order[]>();
-  for (const o of orders) {
-    const list = bySymbol.get(o.symbol) ?? [];
-    list.push(o);
-    bySymbol.set(o.symbol, list);
-  }
-  return Array.from(bySymbol.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([symbol, symbolOrders]) => {
-      const sumSize = symbolOrders.reduce((acc, o) => acc + o.size, 0);
-      const sumSwap = symbolOrders.reduce((acc, o) => acc + o.swap, 0);
-      const avgOpenPrice =
-        symbolOrders.length > 0
-          ? symbolOrders.reduce((acc, o) => acc + o.openPrice, 0) /
-            symbolOrders.length
-          : 0;
-      const bid = quotes.get(symbol) ?? 0;
-      const contractSize = getContractSize(symbol);
-      const sumProfit = symbolOrders.reduce(
-        (acc, o) => acc + orderProfit(o, bid, contractSize),
-        0
-      );
-      return {
-        symbol,
-        orders: [...symbolOrders],
-        avgOpenPrice,
-        sumSize,
-        sumSwap,
-        sumProfit,
-      };
-    });
-}
+const QUOTE_SYNC_DEBOUNCE_MS = 80;
 
 @Injectable({ providedIn: 'root' })
 export class OrdersStore {
   private readonly api = inject(OrdersApiService);
+  private readonly config = inject(APP_CONFIG);
   private readonly instruments = inject(InstrumentsService);
   private readonly quotesService = inject(QuotesService);
   private readonly cancelLoad$ = new Subject<void>();
@@ -75,55 +25,72 @@ export class OrdersStore {
 
   readonly uniqueSymbols = computed<string[]>(() => {
     const seen = new Set<string>();
-    for (const o of this.orders()) {
-      seen.add(o.symbol);
+    for (const order of this.orders()) {
+      seen.add(order.symbol);
     }
-    return Array.from(seen).sort((a, b) => a.localeCompare(b));
+    return Array.from(seen).sort((first, second) => first.localeCompare(second));
   });
 
   readonly groupedOrders = computed<GroupedOrder[]>(() =>
     groupOrdersBySymbol(
       this.orders(),
       this.quotesService.quotes(),
-      (s) => this.instruments.getContractSize(s)
+      (symbol) => this.instruments.getContractSize(symbol)
     )
   );
 
   readonly orderProfits = computed<Map<number, number>>(() => {
     const orders = this.orders();
     const quotesMap = this.quotesService.quotes();
-    const getContractSize = (s: string) =>
-      this.instruments.getContractSize(s);
-    const map = new Map<number, number>();
-    for (const o of orders) {
-      const bid = quotesMap.get(o.symbol) ?? 0;
-      const contractSize = getContractSize(o.symbol);
-      map.set(o.id, orderProfit(o, bid, contractSize));
+    const getContractSize = (symbol: string) =>
+      this.instruments.getContractSize(symbol);
+    const profitMap = new Map<number, number>();
+    for (const order of orders) {
+      const bid = quotesMap.get(order.symbol) ?? 0;
+      const contractSize = getContractSize(order.symbol);
+      profitMap.set(order.id, orderProfit(order, bid, contractSize));
     }
-    return map;
+    return profitMap;
   });
 
   private prevQuoteSymbols: string[] = [];
+  private quoteSyncTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
       const symbols = this.uniqueSymbols();
       this.quotesService.connect();
-      // Re-run when connected so subscribe/unsubscribe succeed (WS is async)
       const isConnected = this.quotesService.connected();
-      const toRemove = this.prevQuoteSymbols.filter(
-        (s) => !symbols.includes(s)
-      );
-      const toAdd = symbols.filter(
-        (s) => !this.prevQuoteSymbols.includes(s)
-      );
-      if (toRemove.length > 0) this.quotesService.unsubscribe(toRemove);
-      if (toAdd.length > 0) this.quotesService.subscribe(toAdd);
-      // Only mark as synced when WS is open; otherwise effect re-runs on connect
-      if (isConnected || (toAdd.length === 0 && toRemove.length === 0)) {
-        this.prevQuoteSymbols = [...symbols];
+      const max = this.config.wsMaxSubscribedSymbols ?? Infinity;
+      const capped = max < Infinity ? symbols.slice(0, max) : symbols;
+
+      const performSync = () => {
+        const toRemove = this.prevQuoteSymbols.filter((s) => !capped.includes(s));
+        const toAdd = capped.filter((s) => !this.prevQuoteSymbols.includes(s));
+        if (toRemove.length > 0) this.quotesService.unsubscribe(toRemove);
+        if (toAdd.length > 0) this.quotesService.subscribe(toAdd);
+        if (isConnected || (toAdd.length === 0 && toRemove.length === 0)) {
+          this.prevQuoteSymbols = [...capped];
+        }
+      };
+
+      this.clearQuoteSyncTimer();
+      if (isConnected) {
+        this.quoteSyncTimer = setTimeout(() => {
+          this.quoteSyncTimer = null;
+          performSync();
+        }, QUOTE_SYNC_DEBOUNCE_MS);
+      } else {
+        performSync();
       }
     });
+  }
+
+  private clearQuoteSyncTimer(): void {
+    if (this.quoteSyncTimer) {
+      clearTimeout(this.quoteSyncTimer);
+      this.quoteSyncTimer = null;
+    }
   }
 
   loadOrders(): void {
@@ -142,23 +109,23 @@ export class OrdersStore {
           this.orders.set(data);
           this.loading.set(false);
         },
-        error: (err) => {
-          this.error.set(err?.message ?? 'Failed to load orders');
+        error: (error) => {
+          this.error.set(error?.message ?? 'Failed to load orders');
           this.loading.set(false);
         },
       });
   }
 
   removeOrder(id: number): void {
-    this.orders.update((list) => list.filter((o) => o.id !== id));
+    this.orders.update((list) => list.filter((order) => order.id !== id));
   }
 
   removeGroup(symbol: string): void {
-    this.orders.update((list) => list.filter((o) => o.symbol !== symbol));
+    this.orders.update((list) => list.filter((order) => order.symbol !== symbol));
   }
 
   addOrder(payload: Omit<Order, 'id' | 'swap'>): number {
-    const maxId = Math.max(0, ...this.orders().map((o) => o.id));
+    const maxId = Math.max(0, ...this.orders().map((order) => order.id));
     const order: Order = {
       ...payload,
       id: maxId + 1,

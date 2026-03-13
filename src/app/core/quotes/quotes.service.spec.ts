@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
-import { QuotesService } from '@core/orders/quotes.service';
+import { APP_CONFIG } from '@core/config/app-config.token';
+import { QuotesService } from '@core/quotes/quotes.service';
 
 const sentMessages: { p: string; d: string[] }[] = [];
 let mockWsInstance: MockWsInstance | null = null;
@@ -55,6 +56,7 @@ function installMockWebSocket(): void {
 
     close(): void {
       this.readyState = 3;
+      this.onclose?.();
     }
 
     simulateOpen(): void {
@@ -87,6 +89,18 @@ describe('QuotesService', () => {
       providers: [
         QuotesService,
         { provide: PLATFORM_ID, useValue: 'browser' },
+        {
+          provide: APP_CONFIG,
+          useValue: {
+            production: false,
+            ordersUrl: '',
+            instrumentsUrl: '',
+            contractTypesUrl: '',
+            quotesWsUrl: 'wss://test.example/quotes',
+            wsPingIntervalMs: 30_000,
+            wsReconnectDelayMs: 1_000,
+          },
+        },
       ],
     });
     service = TestBed.inject(QuotesService);
@@ -101,10 +115,11 @@ describe('QuotesService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should set connected to true on open', async () => {
+  it('should set connected and alive to true on open', async () => {
     service.connect();
     await new Promise((r) => setTimeout(r, 10));
     expect(service.connected()).toBe(true);
+    expect(service.alive()).toBe(true);
   });
 
   it('should send addlist when subscribing', async () => {
@@ -127,6 +142,16 @@ describe('QuotesService', () => {
       p: '/subscribe/removelist',
       d: ['BTCUSD'],
     });
+  });
+
+  it('should set alive when receiving pong', async () => {
+    service.connect();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(service.alive()).toBe(true);
+    if (mockWsOnMessage) {
+      mockWsOnMessage({ data: JSON.stringify({ p: '/pong' }) });
+    }
+    expect(service.alive()).toBe(true);
   });
 
   it('should update quotes signal on subscribed message', async () => {

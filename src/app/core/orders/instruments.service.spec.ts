@@ -5,11 +5,11 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
-import {
-  CONTRACT_TYPES_API_URL,
-  INSTRUMENTS_API_URL,
-} from '@core/orders/instruments-api.config';
+import { APP_CONFIG } from '@core/config/app-config.token';
 import { InstrumentsService } from '@core/orders/instruments.service';
+
+const TEST_INSTRUMENTS_URL = 'https://test.example/instruments.json';
+const TEST_CONTRACT_TYPES_URL = 'https://test.example/contract-types.json';
 
 describe('InstrumentsService', () => {
   let service: InstrumentsService;
@@ -21,6 +21,18 @@ describe('InstrumentsService', () => {
         InstrumentsService,
         provideHttpClient(),
         provideHttpClientTesting(),
+        {
+          provide: APP_CONFIG,
+          useValue: {
+            production: false,
+            ordersUrl: '',
+            instrumentsUrl: TEST_INSTRUMENTS_URL,
+            contractTypesUrl: TEST_CONTRACT_TYPES_URL,
+            quotesWsUrl: '',
+            wsPingIntervalMs: 15000,
+            wsReconnectDelayMs: 1000,
+          },
+        },
       ],
     });
     service = TestBed.inject(InstrumentsService);
@@ -47,8 +59,8 @@ describe('InstrumentsService', () => {
 
     const mapPromise = firstValueFrom(service.loadContractSizes());
 
-    const instReq = httpCtrl.expectOne(INSTRUMENTS_API_URL);
-    const ctReq = httpCtrl.expectOne(CONTRACT_TYPES_API_URL);
+    const instReq = httpCtrl.expectOne(TEST_INSTRUMENTS_URL);
+    const ctReq = httpCtrl.expectOne(TEST_CONTRACT_TYPES_URL);
     instReq.flush(instruments);
     ctReq.flush(contractTypes);
 
@@ -66,8 +78,8 @@ describe('InstrumentsService', () => {
     const mapPromise = firstValueFrom(service.loadContractSizes()).catch(
       () => null
     );
-    const instReq = httpCtrl.expectOne(INSTRUMENTS_API_URL);
-    const ctReq = httpCtrl.expectOne(CONTRACT_TYPES_API_URL);
+    const instReq = httpCtrl.expectOne(TEST_INSTRUMENTS_URL);
+    const ctReq = httpCtrl.expectOne(TEST_CONTRACT_TYPES_URL);
     ctReq.flush([]); // complete first so forkJoin doesn't cancel it
     instReq.flush('Server error', {
       status: 500,

@@ -8,46 +8,43 @@ import {
 } from '@angular/core';
 import { OrdersStore } from '@core/orders/orders.store';
 import { NotificationService } from '@core/notification/notification.service';
-import { OrdersTableComponent } from '@app/features/orders/orders-table.component';
-import { AddOrderModalComponent } from '@app/features/orders/add-order-modal.component';
+import { OrdersTableComponent } from '@app/features/orders/components/orders-table/orders-table.component';
+import { AddOrderModalComponent } from '@app/features/orders/components/add-order-modal/add-order-modal.component';
+import { ButtonComponent } from '@shared/components/button.component';
+import { formatSigned } from '@shared/utils/format.utils';
 
 @Component({
   selector: 'app-orders-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [OrdersTableComponent, AddOrderModalComponent],
+  imports: [OrdersTableComponent, AddOrderModalComponent, ButtonComponent],
   template: `
-    <div class="min-h-screen p-8">
-      <div class="max-w-7xl mx-auto">
-        <header class="flex items-center justify-between mb-8">
+    <div class="h-screen overflow-hidden flex flex-col p-4 sm:p-6 lg:p-8">
+      <div class="max-w-7xl mx-auto flex-1 flex flex-col min-h-0 w-full">
+        <header class="shrink-0 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
           <div>
-            <h1 class="text-3xl font-bold mb-2 text-[var(--color-text)]">Orders Table</h1>
-            <p class="text-[var(--color-text-muted)]">Manage your trading orders</p>
+            <h1 class="text-3xl font-bold mb-2 text-text">Orders Table</h1>
+            <p class="text-text-muted">Manage your trading orders</p>
           </div>
           <div class="flex items-center gap-4">
-            <button
-              type="button"
-              (click)="showModal.set(true)"
-              class="inline-flex items-center gap-2 px-6 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-            >
+            <app-button variant="primary" (clicked)="showModal.set(true)">
               <span aria-hidden="true">+</span>
               Add New Order
-            </button>
+            </app-button>
           </div>
         </header>
         @if (store.loading()) {
-          <p class="text-[var(--color-text)]">Loading orders...</p>
+          <p class="text-text">Loading orders...</p>
         } @else if (store.error()) {
-          <p class="text-[var(--color-text)]" role="alert">{{ store.error() }}</p>
+          <p class="text-text" role="alert">{{ store.error() }}</p>
         } @else {
-          <div class="rounded-xl shadow-sm border border-[var(--color-border)] overflow-hidden bg-[var(--color-row-bg)]" role="region" aria-label="Orders table">
+          <div class="flex-1 min-h-0 max-h-[60vh] flex flex-col rounded-xl shadow-sm border border-border bg-row-bg" role="region" aria-label="Orders table">
             <app-orders-table
-              ngSkipHydration
               [groupedOrders]="store.groupedOrders()"
               [orderProfits]="store.orderProfits()"
             />
           </div>
           @if (store.groupedOrders().length > 0) {
-            <div class="mt-6 flex items-center justify-between text-sm text-[var(--color-text-muted)]">
+            <div class="shrink-0 mt-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-text-muted">
               <span>Showing {{ store.groupedOrders().length }} symbol groups with {{ totalOrders() }} total orders</span>
               <span>Total Profit: <strong [style.color]="totalProfitColor()">{{ totalProfitFormatted() }}</strong></span>
             </div>
@@ -82,11 +79,9 @@ export class OrdersPage implements OnInit {
     this.totalProfit() >= 0 ? 'var(--color-profit-positive)' : 'var(--color-profit-negative)'
   );
 
-  protected readonly totalProfitFormatted = computed(() => {
-    const p = this.totalProfit();
-    const f = Math.abs(p).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return (p >= 0 ? '+' : '-') + f;
-  });
+  protected readonly totalProfitFormatted = computed(() =>
+    formatSigned(this.totalProfit(), 2)
+  );
 
   ngOnInit(): void {
     this.store.loadOrders();
